@@ -22,11 +22,25 @@ namespace OpenPrinterWeb.Services
             _client = new SharpIppClient();
         }
 
-        public async Task<bool> PrintDocumentAsync(string jobName, Stream documentStream)
+        public async Task<bool> PrintDocumentAsync(string jobName, Stream documentStream, string? printerUri = null, PrintOptions? options = null)
         {
             try
             {
-                var uri = new Uri(_printerUri);
+                var targetUri = printerUri ?? _printerUri;
+                var uri = new Uri(targetUri);
+                // Add color mode attributes explicitly for better compatibility with CUPS
+                var additionalAttributes = new List<IppAttribute>();
+                if (options?.ColorMode == OpenPrinterWeb.Services.PrintColorMode.Monochrome)
+                {
+                    additionalAttributes.Add(new IppAttribute(Tag.Keyword, "print-color-mode", "monochrome"));
+                    additionalAttributes.Add(new IppAttribute(Tag.NameWithoutLanguage, "ColorModel", "Gray"));
+                }
+                else
+                {
+                    additionalAttributes.Add(new IppAttribute(Tag.Keyword, "print-color-mode", "color"));
+                    additionalAttributes.Add(new IppAttribute(Tag.NameWithoutLanguage, "ColorModel", "RGB"));
+                }
+
                 var request = new PrintJobRequest
                 {
                     Document = documentStream,
@@ -34,15 +48,49 @@ namespace OpenPrinterWeb.Services
                     {
                         PrinterUri = uri,
                         JobName = jobName
-                    }
+                    },
+                    JobTemplateAttributes = new JobTemplateAttributes
+                    {
+                        Copies = options?.Copies ?? 1,
+                        OrientationRequested = options?.Orientation == PrintOrientation.Landscape
+                            ? Orientation.Landscape
+                            : Orientation.Portrait,
+                        PrintColorMode = options?.ColorMode == OpenPrinterWeb.Services.PrintColorMode.Monochrome 
+                            ? SharpIpp.Protocol.Models.PrintColorMode.Monochrome 
+                            : SharpIpp.Protocol.Models.PrintColorMode.Color
+                    },
+                    AdditionalJobAttributes = additionalAttributes
                 };
+
+                if (options != null && !string.IsNullOrEmpty(options.PageRange))
+                {
+                    // Parse "1-5, 8" etc.
+                    var ranges = new List<SharpIpp.Protocol.Models.Range>();
+                    var parts = options.PageRange.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var part in parts)
+                    {
+                        var rangeParts = part.Trim().Split('-', StringSplitOptions.RemoveEmptyEntries);
+                        if (rangeParts.Length == 1 && int.TryParse(rangeParts[0], out var single))
+                        {
+                            ranges.Add(new SharpIpp.Protocol.Models.Range(single, single));
+                        }
+                        else if (rangeParts.Length == 2 && int.TryParse(rangeParts[0], out var low) && int.TryParse(rangeParts[1], out var high))
+                        {
+                            ranges.Add(new SharpIpp.Protocol.Models.Range(low, high));
+                        }
+                    }
+                    if (ranges.Any())
+                    {
+                        request.JobTemplateAttributes.PageRanges = ranges.ToArray();
+                    }
+                }
 
                 var response = await _client.PrintJobAsync(request);
                 return response.JobState == JobState.Pending || response.JobState == JobState.Processing || response.JobState == JobState.PendingHeld;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error printing: {ex.Message}");
+                Console.WriteLine($"DEBUG: Error printing: {ex}");
                 // Log exception
                 return false;
             }
@@ -52,17 +100,20 @@ namespace OpenPrinterWeb.Services
         {
             try
             {
+                // Use base server URI for getting all jobs
                 var uri = new Uri(_printerUri);
-                // GetJobsRequest usage
+                var baseUri = new Uri($"{uri.Scheme}://{uri.Host}:{uri.Port}");
+                
                 var jobsRequest = new GetJobsRequest
                 {
                     OperationAttributes = new GetJobsOperationAttributes
                     {
-                        PrinterUri = uri,
+                        PrinterUri = baseUri,
                         WhichJobs = WhichJobs.NotCompleted
                     }
                 };
 
+                Console.WriteLine($"DEBUG: Fetching jobs from {baseUri}");
                 var response = await _client.GetJobsAsync(jobsRequest);
                 
                 return response.Jobs.Select(j => new JobStatusInfo
@@ -76,7 +127,7 @@ namespace OpenPrinterWeb.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting jobs: {ex.Message}");
+                Console.WriteLine($"DEBUG: Error getting jobs: {ex}");
                 return Array.Empty<JobStatusInfo>();
             }
         }
@@ -85,7 +136,9 @@ namespace OpenPrinterWeb.Services
         {
             try
             {
-                var baseUri = new Uri(_printerUri);
+                var uri = new Uri(_printerUri);
+                var baseUri = new Uri($"{uri.Scheme}://{uri.Host}:{uri.Port}");
+
                 var request = new CUPSGetPrintersRequest
                 {
                     OperationAttributes = new CUPSGetPrintersOperationAttributes
@@ -94,6 +147,7 @@ namespace OpenPrinterWeb.Services
                     }
                 };
                 
+                Console.WriteLine($"DEBUG: Fetching printers from {baseUri}");
                 var response = await _client.GetCUPSPrintersAsync(request);
                 var printers = new List<PrinterInfo>();
 
@@ -101,8 +155,6 @@ namespace OpenPrinterWeb.Services
                 {
                     foreach (var section in response.Sections)
                     {
-                        // Check if section is PrinterAttributes. 
-                        // Tag might be an enum. We can try to match by value or assume PrinterAttributesTag (0x04)
                         if ((int)section.Tag == 4 /* PrinterAttributes */)
                         {
                             var info = new PrinterInfo();
@@ -147,7 +199,7 @@ namespace OpenPrinterWeb.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting printers: {ex.Message}");
+                Console.WriteLine($"DEBUG: Error getting printers: {ex}");
                 return Array.Empty<PrinterInfo>();
             }
         }

@@ -6,9 +6,29 @@ namespace OpenPrinterWeb.Services
 {
     public interface IPrintService
     {
-        Task<bool> PrintDocumentAsync(string jobName, Stream documentStream);
+        Task<bool> PrintDocumentAsync(string jobName, Stream documentStream, string? printerUri = null, PrintOptions? options = null);
         Task<JobStatusInfo[]> GetJobsAsync();
         Task<PrinterInfo[]> GetPrintersAsync();
+    }
+
+    public enum PrintOrientation
+    {
+        Portrait,
+        Landscape
+    }
+
+    public enum PrintColorMode
+    {
+        Color,
+        Monochrome
+    }
+
+    public class PrintOptions
+    {
+        public PrintColorMode ColorMode { get; set; } = PrintColorMode.Color;
+        public int Copies { get; set; } = 1;
+        public string? PageRange { get; set; }
+        public PrintOrientation Orientation { get; set; } = PrintOrientation.Portrait;
     }
 
     public class JobStatusInfo
