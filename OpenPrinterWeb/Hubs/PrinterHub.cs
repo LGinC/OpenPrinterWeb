@@ -7,7 +7,7 @@ namespace OpenPrinterWeb.Hubs
     {
         public async Task SendStatusUpdate(string message)
         {
-             await Clients.All.SendAsync("ReceiveStatusUpdate", message);
+            await Clients.All.SendAsync("ReceiveStatusUpdate", message);
         }
     }
 }

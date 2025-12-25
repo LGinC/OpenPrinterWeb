@@ -50,7 +50,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
-    
+
     // Allow JWT in cookies for static file protection (optional, but requested for wwwroot)
     options.Events = new JwtBearerEvents
     {
@@ -103,7 +103,7 @@ app.UseAuthorization();
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value;
-    if (path != null && 
+    if (path != null &&
         !path.StartsWith("/login", StringComparison.OrdinalIgnoreCase) &&
         !path.StartsWith("/api/auth", StringComparison.OrdinalIgnoreCase) &&
         !path.StartsWith("/_framework", StringComparison.OrdinalIgnoreCase) &&

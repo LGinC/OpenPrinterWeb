@@ -55,8 +55,8 @@ namespace OpenPrinterWeb.Services
                         OrientationRequested = options?.Orientation == PrintOrientation.Landscape
                             ? Orientation.Landscape
                             : Orientation.Portrait,
-                        PrintColorMode = options?.ColorMode == OpenPrinterWeb.Services.PrintColorMode.Monochrome 
-                            ? SharpIpp.Protocol.Models.PrintColorMode.Monochrome 
+                        PrintColorMode = options?.ColorMode == OpenPrinterWeb.Services.PrintColorMode.Monochrome
+                            ? SharpIpp.Protocol.Models.PrintColorMode.Monochrome
                             : SharpIpp.Protocol.Models.PrintColorMode.Color
                     },
                     AdditionalJobAttributes = additionalAttributes
@@ -103,7 +103,7 @@ namespace OpenPrinterWeb.Services
                 // Use base server URI for getting all jobs
                 var uri = new Uri(_printerUri);
                 var baseUri = new Uri($"{uri.Scheme}://{uri.Host}:{uri.Port}");
-                
+
                 var jobsRequest = new GetJobsRequest
                 {
                     OperationAttributes = new GetJobsOperationAttributes
@@ -115,14 +115,14 @@ namespace OpenPrinterWeb.Services
 
                 Console.WriteLine($"DEBUG: Fetching jobs from {baseUri}");
                 var response = await _client.GetJobsAsync(jobsRequest);
-                
+
                 return response.Jobs.Select(j => new JobStatusInfo
                 {
                     Id = j.JobId.GetValueOrDefault(),
                     Name = j.JobName ?? "Unknown",
                     State = j.JobState.ToString() ?? "Unknown",
                     User = j.JobOriginatingUserName ?? "Unknown",
-                    CreatedAt = DateTime.Now 
+                    CreatedAt = DateTime.Now
                 }).ToArray();
             }
             catch (Exception ex)
@@ -146,7 +146,7 @@ namespace OpenPrinterWeb.Services
                         PrinterUri = baseUri
                     }
                 };
-                
+
                 Console.WriteLine($"DEBUG: Fetching printers from {baseUri}");
                 var response = await _client.GetCUPSPrintersAsync(request);
                 var printers = new List<PrinterInfo>();
@@ -171,7 +171,7 @@ namespace OpenPrinterWeb.Services
                                             info.Uri = uris.FirstOrDefault() ?? string.Empty;
                                         else if (attr.Value is object[] arr && arr.Length > 0)
                                             info.Uri = arr[0]?.ToString() ?? string.Empty;
-                                        else 
+                                        else
                                             info.Uri = attr.Value?.ToString() ?? string.Empty;
                                         break;
                                     case "printer-info":
@@ -186,7 +186,7 @@ namespace OpenPrinterWeb.Services
 
                             // Determine if default
                             info.IsDefault = _printerUri.Contains(info.Name, StringComparison.OrdinalIgnoreCase);
-                            
+
                             if (!string.IsNullOrEmpty(info.Name))
                             {
                                 printers.Add(info);
