@@ -123,4 +123,22 @@
   <data name="InvalidPasswordMessage" xml:space="preserve">
     <value>잘못된 비밀번호입니다.</value>
   </data>
+  <data name="ManageYourNetworkPrints" xml:space="preserve">
+    <value>네트워크 인쇄를 손쉽게 관리하세요</value>
+  </data>
+  <data name="LiveUpdatesActive" xml:space="preserve">
+    <value>라이브 업데이트 활성</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>오프라인</value>
+  </data>
+  <data name="DragAndDropOrBrowse" xml:space="preserve">
+    <value>여기에 파일을 드래그 앤 드롭하거나 찾아보기</value>
+  </data>
+  <data name="SupportedFormatsHint" xml:space="preserve">
+    <value>지원되는 형식: PDF, JPG, PNG (최대 10MB)</value>
+  </data>
+  <data name="SelectFileButton" xml:space="preserve">
+    <value>파일 선택</value>
+  </data>
 </root>

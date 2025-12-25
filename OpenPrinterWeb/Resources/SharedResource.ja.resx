@@ -123,4 +123,22 @@
   <data name="InvalidPasswordMessage" xml:space="preserve">
     <value>パスワードが無効です。</value>
   </data>
+  <data name="ManageYourNetworkPrints" xml:space="preserve">
+    <value>ネットワーク印刷を簡単に管理</value>
+  </data>
+  <data name="LiveUpdatesActive" xml:space="preserve">
+    <value>ライブアップデート有効</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>オフライン</value>
+  </data>
+  <data name="DragAndDropOrBrowse" xml:space="preserve">
+    <value>ファイルをここにドラッグ＆ドロップ、または参照</value>
+  </data>
+  <data name="SupportedFormatsHint" xml:space="preserve">
+    <value>対応フォーマット: PDF, JPG, PNG (最大 10MB)</value>
+  </data>
+  <data name="SelectFileButton" xml:space="preserve">
+    <value>ファイルを選択</value>
+  </data>
 </root>

@@ -1,16 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider Theme="_currentTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
+    <MudAppBar Elevation="0" Class="glass-appbar border-b-1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">OpenPrinterWeb</MudText>
+        <MudText Typo="Typo.h5" Class="ml-2 fw-bold primary-text">OpenPrinter<span class="opacity-50">Web</span></MudText>
         <MudSpacer />
-        <MudMenu Icon="@Icons.Material.Filled.Language" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+        <MudMenu Icon="@Icons.Material.Filled.Language" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Dense="true" Class="mr-2">
             <MudMenuItem OnClick="@(() => ChangeLanguage("en-US"))">English</MudMenuItem>
             <MudMenuItem OnClick="@(() => ChangeLanguage("zh-Hans"))">中文</MudMenuItem>
             <MudMenuItem OnClick="@(() => ChangeLanguage("ja"))">日本語</MudMenuItem>
@@ -21,27 +21,73 @@
             <MudMenuItem OnClick="@(() => ChangeLanguage("ko"))">한국어</MudMenuItem>
             <MudMenuItem OnClick="@(() => ChangeLanguage("fr"))">Français</MudMenuItem>
         </MudMenu>
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
-</MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu />
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" href="https://github.com/lginc/OpenPrinterWeb" Target="_blank" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive">
+        <div class="pa-4 d-flex flex-column h-100">
+            <NavMenu />
+            <MudSpacer />
+            @if (!string.IsNullOrEmpty(AppVersion))
+            {
+                <div class="pa-4 rounded-lg bg-primary-light mud-text-primary text-center">
+                    <MudText Typo="Typo.caption" Class="fw-bold">@AppVersion</MudText>
+                </div>
+            }
+        </div>
     </MudDrawer>
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    <MudMainContent Class="bg-page">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-8">
             @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
+<style>
+    .glass-appbar {
+        background-color: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(12px);
+        color: var(--mud-palette-text-primary) !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .fw-bold { font-weight: 700; }
+    .primary-text { color: var(--mud-palette-primary); }
+    .opacity-50 { opacity: 0.5; }
+    .bg-page { background-color: #f8fafc; min-height: 100vh; }
+    .bg-primary-light { background-color: rgba(var(--mud-palette-primary-rgb), 0.1); }
+    
+    .border-b-1 { border-bottom: 1px solid rgba(0,0,0,0.1); }
+</style>
+
 @inject NavigationManager Navigation
 
 @code {
     bool _drawerOpen = true;
+    private MudTheme _currentTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#3b82f6", // Modern Blue
+            Secondary = "#64748b",
+            AppbarBackground = "rgba(255,255,255,0.7)",
+            Background = "#f8fafc",
+            Surface = "#ffffff",
+            DrawerBackground = "#ffffff",
+            Success = "#10b981",
+        },
+
+        LayoutProperties = new LayoutProperties()
+        {
+            DefaultBorderRadius = "12px",
+        }
+    };
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
+
+    private string? AppVersion => Environment.GetEnvironmentVariable("APP_VERSION");
 
     private void ChangeLanguage(string culture)
     {

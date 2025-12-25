@@ -123,4 +123,22 @@
   <data name="InvalidPasswordMessage" xml:space="preserve">
     <value>Invalid password.</value>
   </data>
+  <data name="ManageYourNetworkPrints" xml:space="preserve">
+    <value>Manage your network prints effortlessly</value>
+  </data>
+  <data name="LiveUpdatesActive" xml:space="preserve">
+    <value>Live Updates Active</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="DragAndDropOrBrowse" xml:space="preserve">
+    <value>Drag &amp; drop your file here, or browse</value>
+  </data>
+  <data name="SupportedFormatsHint" xml:space="preserve">
+    <value>Supported formats: PDF, JPG, PNG (Max 10MB)</value>
+  </data>
+  <data name="SelectFileButton" xml:space="preserve">
+    <value>Select File</value>
+  </data>
 </root>

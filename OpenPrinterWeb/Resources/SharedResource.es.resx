@@ -123,4 +123,22 @@
   <data name="InvalidPasswordMessage" xml:space="preserve">
     <value>Contraseña no válida.</value>
   </data>
+  <data name="ManageYourNetworkPrints" xml:space="preserve">
+    <value>Gestione sus impresiones de red sin esfuerzo</value>
+  </data>
+  <data name="LiveUpdatesActive" xml:space="preserve">
+    <value>Actualizaciones en vivo activas</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>Desconectado</value>
+  </data>
+  <data name="DragAndDropOrBrowse" xml:space="preserve">
+    <value>Arrastre y suelte su archivo aquí, o examine</value>
+  </data>
+  <data name="SupportedFormatsHint" xml:space="preserve">
+    <value>Formatos soportados: PDF, JPG, PNG (Máx. 10MB)</value>
+  </data>
+  <data name="SelectFileButton" xml:space="preserve">
+    <value>Seleccionar archivo</value>
+  </data>
 </root>

@@ -11,35 +11,128 @@
 
 <PageTitle>@Localizer["LoginTitle"]</PageTitle>
 
-<div class="d-flex justify-center align-center h-100 mt-16">
-    <MudCard Elevation="4" Class="pa-8">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h5" Align="Align.Center">@Localizer["LoginHeader"]</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudTextField T="string" Label="@Localizer["PasswordLabel"]" @bind-Value="password" 
-                          InputType="InputType.Password" Variant="Variant.Outlined" 
-                          OnKeyDown="HandleKeyDown" FullWidth="true" />
-            
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <MudAlert Severity="Severity.Error" Class="mt-4">@errorMessage</MudAlert>
-            }
-        </MudCardContent>
-        <MudCardActions Class="d-flex justify-center pb-8">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PerformLogin" 
-                       Disabled="isLoading" FullWidth="true" Size="Size.Large">
-                @if (isLoading)
+<div class="login-page">
+    <div class="login-background"></div>
+    <div class="login-container">
+        <MudCard Elevation="25" Class="login-card rounded-xl pa-10">
+            <div class="d-flex flex-column align-center mb-8">
+                <div class="logo-icon-bg mb-4">
+                    <MudIcon Icon="@Icons.Material.Filled.Print" Size="Size.Large" Color="Color.Primary" />
+                </div>
+                <MudText Typo="Typo.h4" Class="primary-text fw-bold">OpenPrinter</MudText>
+                <MudText Typo="Typo.subtitle2" Class="opacity-60">@Localizer["LoginHeader"]</MudText>
+            </div>
+
+            <MudCardContent>
+                <MudTextField T="string" Label="@Localizer["PasswordLabel"]" @bind-Value="password" 
+                              InputType="InputType.Password" Variant="Variant.Outlined" 
+                              OnKeyDown="HandleKeyDown" FullWidth="true"
+                              Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Lock"
+                              Class="mb-4 rounded-lg" AutoFocus="true" />
+                
+                @if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2"/>
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mt-4 rounded-lg animate-shake">@errorMessage</MudAlert>
                 }
-                @Localizer["LoginButton"]
-            </MudButton>
-        </MudCardActions>
-    </MudCard>
+            </MudCardContent>
+
+            <MudCardActions Class="mt-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PerformLogin" 
+                           Disabled="isLoading" FullWidth="true" Size="Size.Large"
+                           Class="py-4 rounded-xl shadow-lg hover-scale">
+                    @if (isLoading)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2"/>
+                        <MudText>@Localizer["LoginButton"]...</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="fw-bold">@Localizer["LoginButton"]</MudText>
+                    }
+                </MudButton>
+            </MudCardActions>
+
+            <div class="mt-8 text-center opacity-40">
+                <MudText Typo="Typo.caption">© 2025 OpenPrinter. Secure Network Management.</MudText>
+            </div>
+        </MudCard>
+    </div>
 </div>
+
+<style>
+    .login-page {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .login-background {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        z-index: -1;
+    }
+
+    /* Subtle background circles for depth */
+    .login-background::before, .login-background::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.15;
+    }
+
+    .login-background::before {
+        width: 400px; height: 400px;
+        background: var(--mud-palette-primary);
+        top: -100px; left: -100px;
+    }
+
+    .login-background::after {
+        width: 300px; height: 300px;
+        background: var(--mud-palette-secondary);
+        bottom: -50px; right: -50px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 450px;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .logo-icon-bg {
+        width: 64px; height: 64px;
+        background: rgba(var(--mud-palette-primary-rgb), 0.1);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .primary-text { color: var(--mud-palette-primary); }
+    .opacity-60 { opacity: 0.6; }
+    .opacity-40 { opacity: 0.4; }
+
+    .hover-scale { transition: transform 0.2s ease; }
+    .hover-scale:hover { transform: scale(1.02); }
+
+    .animate-shake {
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @@keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+</style>
 
 @code {
     private string password = "";

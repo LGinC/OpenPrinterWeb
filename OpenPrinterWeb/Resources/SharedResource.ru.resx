@@ -123,4 +123,22 @@
   <data name="InvalidPasswordMessage" xml:space="preserve">
     <value>Неверный пароль.</value>
   </data>
+  <data name="ManageYourNetworkPrints" xml:space="preserve">
+    <value>Управляйте сетевой печатью без усилий</value>
+  </data>
+  <data name="LiveUpdatesActive" xml:space="preserve">
+    <value>Живые обновления активны</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>Офлайн</value>
+  </data>
+  <data name="DragAndDropOrBrowse" xml:space="preserve">
+    <value>Перетащите файл сюда или выберите</value>
+  </data>
+  <data name="SupportedFormatsHint" xml:space="preserve">
+    <value>Поддерживаемые форматы: PDF, JPG, PNG (Макс. 10 МБ)</value>
+  </data>
+  <data name="SelectFileButton" xml:space="preserve">
+    <value>Выбрать файл</value>
+  </data>
 </root>

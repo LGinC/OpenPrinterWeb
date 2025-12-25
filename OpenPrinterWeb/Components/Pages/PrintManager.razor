@@ -10,211 +10,423 @@
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<PageTitle>@Localizer["PrintManagerTitle"]</PageTitle>
+<div class="dashboard-container">
+    <div class="d-flex align-center mb-6">
+        <MudIcon Icon="@Icons.Material.Filled.Print" Size="Size.Large" Color="Color.Primary" Class="mr-3" />
+        <div>
+            <MudText Typo="Typo.h4" Class="fw-bold">@Localizer["PrintManagerTitle"]</MudText>
+            <MudText Typo="Typo.subtitle2" Color="Color.Secondary">@Localizer["ManageYourNetworkPrints"]</MudText>
+        </div>
+        <MudSpacer />
+        <MudChip T="string" Icon="@Icons.Material.Filled.FiberManualRecord" Color="@(hubConnection?.State == HubConnectionState.Connected ? Color.Success : Color.Error)" Variant="Variant.Text">
+            @(hubConnection?.State == HubConnectionState.Connected ? Localizer["LiveUpdatesActive"] : Localizer["Offline"])
+        </MudChip>
+    </div>
 
-<MudText Typo="Typo.h3" GutterBottom="true">@Localizer["PrintManagerTitle"]</MudText>
+    <MudGrid>
+        @* Main Action Area: Upload & Preview *@
+        <MudItem xs="12" lg="8">
+            <MudCard Elevation="4" Class="rounded-lg mb-6 overflow-hidden">
+                <MudCardHeader Class="bg-surface-light border-b-1">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Class="fw-bold">
+                            <MudIcon Icon="@Icons.Material.Filled.LibraryAdd" Size="Size.Small" Class="mr-2 mb-1" />
+                            @Localizer["UploadAndPrintHeader"]
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-6">
+                    @if (string.IsNullOrEmpty(selectedFileUrl))
+                    {
+                        <div class="upload-dropzone d-flex flex-column align-center justify-center py-12 rounded-lg border-2 border-dashed border-primary-light">
+                            <MudIcon Icon="@Icons.Material.Filled.CloudUpload" Size="Size.Large" Color="Color.Primary" Class="mb-4 opacity-70" Style="font-size: 4rem;" />
+                            <MudText Typo="Typo.h6" Color="Color.Primary" GutterBottom="true">@Localizer["DragAndDropOrBrowse"]</MudText>
+                            <MudText Typo="Typo.body2" Class="mb-6 opacity-60">@Localizer["SupportedFormatsHint"]</MudText>
+                            
+                            <MudFileUpload T="IBrowserFile" OnFilesChanged="HandleFileSelection" Accept=".pdf,.jpg,.jpeg,.png">
+                                <ActivatorContent>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="px-10 rounded-pill shadow-lg">
+                                        @Localizer["SelectFileButton"]
+                                    </MudButton>
+                                </ActivatorContent>
+                            </MudFileUpload>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column align-center mb-6">
+                            <div class="preview-container w-100 rounded-lg shadow-inner pa-4 bg-surface-dark overflow-hidden position-relative">
+                                @if (isUploading)
+                                {
+                                    <div class="preview-overlay d-flex align-center justify-center">
+                                        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                                    </div>
+                                }
+                                
+                                <div class="preview-paper-wrapper d-flex justify-center my-4">
+                                    <div class="preview-paper shadow-2xl" style="@GetPaperStyle()">
+                                        <div class="preview-content-inner h-100 w-100 d-flex justify-center align-center" style="@GetContentFilterStyle()">
+                                            <div style="@GetRotationWrapperStyle()">
+                                                @if (selectedFileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <embed src="@($"{selectedFileUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH")" type="application/pdf" style="width: 100%; height: 100%; display: block;" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="@selectedFileUrl" alt="Preview" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-<MudGrid>
-    <MudItem xs="12" md="7">
-        <MudCard Elevation="2" Class="mb-4">
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">@Localizer["UploadAndPrintHeader"]</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <div class="mb-4">
-                    <MudFileUpload T="IBrowserFile" OnFilesChanged="HandleFileSelection" Accept=".pdf,.jpg,.jpeg,.png">
-                        <ActivatorContent>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CloudUpload">
-                                @Localizer["SelectPdfOrImageButton"]
-                            </MudButton>
-                        </ActivatorContent>
-                    </MudFileUpload>
-                </div>
-                
-                @if (isUploading)
-                {
-                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
-                }
-
-                @if (!string.IsNullOrEmpty(selectedFileUrl))
-                {
-                    <MudText Typo="Typo.subtitle1" Class="mt-4 mb-2">@Localizer["PreviewLabel"]</MudText>
-                    <div class="preview-background d-flex justify-content-center align-items-center bg-secondary p-4 rounded mb-4" style="min-height: 450px; overflow: hidden;">
-                        <div class="preview-paper bg-white shadow-lg" style="@GetPaperStyle()">
-                            <div class="preview-content h-100 w-100 d-flex justify-content-center align-items-center" style="@GetContentFilterStyle()">
-                                <div style="@GetRotationWrapperStyle()">
-                                    @if (selectedFileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <embed src="@($"{selectedFileUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH")" type="application/pdf" style="width: 100%; height: 100%; display: block;" />
-                                    }
-                                    else
-                                    {
-                                        <img src="@selectedFileUrl" alt="Preview" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
-                                    }
+                                <div class="preview-info-tag pa-2 px-4 rounded-pill shadow-md">
+                                    <MudIcon Icon="@Icons.Material.Filled.Description" Size="Size.Small" Class="mr-2" />
+                                    <MudText Typo="Typo.caption" Class="fw-bold">@selectedFileName</MudText>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" Color="Color.Error" Class="ml-2" OnClick="() => selectedFileUrl = null" />
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <MudCard Elevation="0" Outlined="true" Class="mb-4 pa-4 bg-light">
-                        <MudText Typo="Typo.subtitle2" Class="mb-4">@Localizer["PrinterAndOptionsLabel"]</MudText>
-                        <MudGrid Spacing="3">
-                        <MudItem xs="12">
-                                <MudSelect T="string" Label="@Localizer["SelectPrinterLabel"]" @bind-Value="selectedPrinterUri" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudDivider Class="my-6 border-1 opacity-20" />
+
+                        <MudGrid Spacing="4">
+                                    <MudItem xs="12">
+                                <MudText Typo="Typo.subtitle1" Class="mb-3 fw-bold">
+                                    <MudIcon Icon="@Icons.Material.Filled.Settings" Size="Size.Small" Class="mr-2 mb-1" />
+                                    @Localizer["PrinterAndOptionsLabel"]
+                                </MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudSelect T="string" Label="@Localizer["SelectPrinterLabel"]" @bind-Value="selectedPrinterUri" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="bg-surface rounded-lg">
                                     @if (printers != null)
                                     {
                                         @foreach (var p in printers)
                                         {
-                                            <MudSelectItem Value="@p.Uri">@p.Name (@p.Description)</MudSelectItem>
+                                            <MudSelectItem Value="@p.Uri">
+                                                <div class="d-flex align-center">
+                                                    <MudIcon Icon="@(p.IsDefault ? Icons.Material.Filled.Star : Icons.Material.Filled.Print)" Size="Size.Small" Color="@(p.IsDefault ? Color.Warning : Color.Default)" Class="mr-2" />
+                                                    @p.Name <span class="ml-2 opacity-60 text-xs">(@p.Description)</span>
+                                                </div>
+                                            </MudSelectItem>
                                         }
                                     }
                                 </MudSelect>
                             </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudSelect T="PrintColorMode" Label="@Localizer["ColorModeLabel"]" @bind-Value="printOptions.ColorMode" Variant="Variant.Outlined">
-                                    <MudSelectItem Value="@PrintColorMode.Color">@Localizer["ColorModeColor"]</MudSelectItem>
-                                    <MudSelectItem Value="@PrintColorMode.Monochrome">@Localizer["ColorModeBw"]</MudSelectItem>
+                            <MudItem xs="6" md="3">
+                                <MudSelect T="PrintColorMode" Label="@Localizer["ColorModeLabel"]" @bind-Value="printOptions.ColorMode" Variant="Variant.Outlined" Class="bg-surface rounded-lg">
+                                    <MudSelectItem Value="@PrintColorMode.Color">
+                                        <div class="d-flex align-center">
+                                            <div class="color-dot bg-gradient-rainbow mr-2"></div>
+                                            @Localizer["ColorModeColor"]
+                                        </div>
+                                    </MudSelectItem>
+                                    <MudSelectItem Value="@PrintColorMode.Monochrome">
+                                        <div class="d-flex align-center">
+                                            <div class="color-dot bg-monochrome mr-2"></div>
+                                            @Localizer["ColorModeBw"]
+                                        </div>
+                                    </MudSelectItem>
                                 </MudSelect>
                             </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudSelect T="PrintOrientation" Label="@Localizer["OrientationLabel"]" @bind-Value="printOptions.Orientation" Variant="Variant.Outlined">
-                                    <MudSelectItem Value="@PrintOrientation.Portrait">@Localizer["OrientationPortrait"]</MudSelectItem>
-                                    <MudSelectItem Value="@PrintOrientation.Landscape">@Localizer["OrientationLandscape"]</MudSelectItem>
+                            <MudItem xs="6" md="3">
+                                <MudSelect T="PrintOrientation" Label="@Localizer["OrientationLabel"]" @bind-Value="printOptions.Orientation" Variant="Variant.Outlined" Class="bg-surface rounded-lg">
+                                    <MudSelectItem Value="@PrintOrientation.Portrait">
+                                        <div class="d-flex align-center">
+                                            <MudIcon Icon="@Icons.Material.Filled.Portrait" Size="Size.Small" Class="mr-2" />
+                                            @Localizer["OrientationPortrait"]
+                                        </div>
+                                    </MudSelectItem>
+                                    <MudSelectItem Value="@PrintOrientation.Landscape">
+                                        <div class="d-flex align-center">
+                                            <MudIcon Icon="@Icons.Material.Filled.Landscape" Size="Size.Small" Class="mr-2" />
+                                            @Localizer["OrientationLandscape"]
+                                        </div>
+                                    </MudSelectItem>
                                 </MudSelect>
                             </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudNumericField @bind-Value="printOptions.Copies" Label="@Localizer["CopiesLabel"]" Variant="Variant.Outlined" Min="1" />
+                            <MudItem xs="6" md="3">
+                                <MudNumericField @bind-Value="printOptions.Copies" Label="@Localizer["CopiesLabel"]" Variant="Variant.Outlined" Min="1" Class="bg-surface rounded-lg" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ContentCopy" />
                             </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="printOptions.PageRange" Label="@Localizer["PageRangeLabel"]" Variant="Variant.Outlined" Placeholder="e.g. 1-5, 8" />
+                            <MudItem xs="6" md="3">
+                                <MudTextField @bind-Value="printOptions.PageRange" Label="@Localizer["PageRangeLabel"]" Variant="Variant.Outlined" Placeholder="e.g. 1-5" Class="bg-surface rounded-lg" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Layers" />
                             </MudItem>
                         </MudGrid>
-                    </MudCard>
 
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="PrintFile" Disabled="@isPrinting" Size="Size.Large">
-                        @if (isPrinting)
+                        <div class="mt-8">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="PrintFile" Disabled="@isPrinting" Size="Size.Large" Class="py-4 rounded-xl shadow-xl hover-scale">
+                                @if (isPrinting)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                    <MudText Class="ms-2 fw-bold">@Localizer["PrintingButton"]</MudText>
+                                }
+                                else
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.LocalPrintshop" Class="mr-2" />
+                                    <MudText Class="fw-bold">@Localizer["PrintNowButton"]</MudText>
+                                }
+                            </MudButton>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(statusMessage))
+                    {
+                        <div class="mt-4 animate-fade-in">
+                            <MudAlert Severity="@GetSeverity()" Variant="Variant.Filled" Elevation="1" Class="rounded-lg">@statusMessage</MudAlert>
+                        </div>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" lg="4">
+            @* Job Queue Status *@
+            <MudCard Elevation="4" Class="rounded-lg mb-6 overflow-hidden">
+                <MudCardHeader Class="bg-surface-light border-b-1">
+                    <CardHeaderContent>
+                        <div class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.Queue" Size="Size.Small" Class="mr-2 mb-1" />
+                            <MudText Typo="Typo.h6" Class="fw-bold">@Localizer["PrinterStatusHeader"]</MudText>
+                            <MudSpacer />
+                            @if (jobs != null && jobs.Any())
+                            {
+                                <MudBadge Content="@jobs.Length" Color="Color.Primary" Overlap="true" Class="mr-2" />
+                            }
+                        </div>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <div class="status-scroll-container">
+                        @if (jobs == null)
                         {
-                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                            <MudText Class="ms-2">@Localizer["PrintingButton"]</MudText>
+                            <div class="d-flex align-center justify-center py-8">
+                                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Medium" />
+                                <MudText Class="ml-3 italic opacity-60">@Localizer["WaitingForUpdates"]</MudText>
+                            </div>
+                        }
+                        else if (jobs.Length == 0)
+                        {
+                            <div class="d-flex flex-column align-center justify-center py-10 opacity-40">
+                                <MudIcon Icon="@Icons.Material.Filled.TaskAlt" Size="Size.Large" Class="mb-2" />
+                                <MudText>@Localizer["NoActiveJobs"]</MudText>
+                            </div>
                         }
                         else
                         {
-                            <MudText>@Localizer["PrintNowButton"]</MudText>
+                            <MudList T="string">
+                                @foreach (var job in jobs.Take(10))
+                                {
+                                    <MudListItem>
+                                        <div class="d-flex align-center w-100">
+                                            <div class="job-id-box rounded mr-4">#@job.Id</div>
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <MudText Typo="Typo.body2" Class="fw-bold truncate">@job.Name</MudText>
+                                                <MudText Typo="Typo.caption" Class="opacity-60">@job.User</MudText>
+                                            </div>
+                                            <MudChip T="string" Color="@GetChipColor(job.State)" Size="Size.Small" Variant="Variant.Outlined" Class="ml-2 px-3">
+                                                @job.State
+                                            </MudChip>
+                                        </div>
+                                    </MudListItem>
+                                    <MudDivider />
+                                }
+                            </MudList>
                         }
-                    </MudButton>
-                }
+                    </div>
+                </MudCardContent>
+            </MudCard>
 
-                @if (!string.IsNullOrEmpty(statusMessage))
-                {
-                    <MudAlert Severity="@GetSeverity()" Variant="Variant.Filled" Class="mt-4">@statusMessage</MudAlert>
-                }
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <MudItem xs="12" md="5">
-        <MudCard Elevation="2">
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">@Localizer["PrinterStatusHeader"]</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                 @if (jobs == null)
-                {
-                    <MudText><em>@Localizer["WaitingForUpdates"]</em></MudText>
-                }
-                else if (jobs.Length == 0)
-                {
-                    <MudText>@Localizer["NoActiveJobs"]</MudText>
-                }
-                else
-                {
-                    <MudSimpleTable Style="overflow-x: auto;" Dense="true" Striped="true">
-                        <thead>
-                            <tr>
-                                <th>@Localizer["JobIdHeader"]</th>
-                                <th>@Localizer["JobNameHeader"]</th>
-                                <th>@Localizer["JobStateHeader"]</th>
-                                <th>@Localizer["JobUserHeader"]</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var job in jobs)
-                            {
-                                <tr>
-                                    <td>@job.Id</td>
-                                    <td>@job.Name</td>
-                                    <td>
-                                        <MudChip T="string" Color="@GetChipColor(job.State)" Size="Size.Small">@job.State</MudChip>
-                                    </td>
-                                    <td>@job.User</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </MudSimpleTable>
-                }
-            </MudCardContent>
-        </MudCard>
-
-        <MudCard Elevation="2" Class="mt-4">
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">@Localizer["AvailablePrintersHeader"]</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                @if (printers == null)
-                {
-                    <MudText><em>@Localizer["LoadingPrinters"]</em></MudText>
-                }
-                else if (printers.Length == 0)
-                {
-                    <MudText>@Localizer["NoPrintersFound"]</MudText>
-                }
-                else
-                {
-                    <MudSimpleTable Style="overflow-x: auto;" Hover="true">
-                        <thead>
-                            <tr>
-                                <th>@Localizer["PrinterNameHeader"]</th>
-                                <th>@Localizer["PrinterStatusHeaderTable"]</th>
-                                <th>@Localizer["PrinterDefaultHeader"]</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var printer in printers)
-                            {
-                                <tr style="cursor: pointer" @onclick="() => selectedPrinterUri = printer.Uri" class="@(selectedPrinterUri == printer.Uri ? "selected-row" : "")">
-                                    <td>
-                                        <MudText Typo="Typo.body2"><b>@printer.Name</b></MudText>
-                                        <MudText Typo="Typo.caption">@printer.Description</MudText>
-                                    </td>
-                                    <td>@printer.State</td>
-                                    <td>
-                                        @if (printer.IsDefault)
-                                        {
-                                            <MudChip T="string" Color="Color.Primary" Size="Size.Small">@Localizer["PrinterDefaultHeader"]</MudChip>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </MudSimpleTable>
-                }
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-</MudGrid>
+            @* Printer Fleet *@
+            <MudCard Elevation="4" Class="rounded-lg overflow-hidden">
+                <MudCardHeader Class="bg-surface-light border-b-1">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Class="fw-bold">
+                            <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" Class="mr-2 mb-1" />
+                            @Localizer["AvailablePrintersHeader"]
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <div class="status-scroll-container">
+                        @if (printers == null)
+                        {
+                            <div class="d-flex align-center justify-center py-8">
+                                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Medium" />
+                            </div>
+                        }
+                        else if (printers.Length == 0)
+                        {
+                            <div class="pa-4 opacity-40 italic text-center">@Localizer["NoPrintersFound"]</div>
+                        }
+                        else
+                        {
+                            <MudList T="string">
+                                @foreach (var printer in printers)
+                                {
+                                    <MudListItem OnClick="() => selectedPrinterUri = printer.Uri" Class="@(selectedPrinterUri == printer.Uri ? "selected-list-item" : "")">
+                                        <div class="d-flex align-center w-100">
+                                            <div class="printer-icon-bg pa-2 rounded-circle mr-3">
+                                                 <MudIcon Icon="@Icons.Material.Filled.Print" Size="Size.Small" />
+                                            </div>
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <div class="d-flex align-center">
+                                                    <MudText Typo="Typo.body2" Class="fw-bold truncate">@printer.Name</MudText>
+                                                    @if (printer.IsDefault)
+                                                    {
+                                                        <MudIcon Icon="@Icons.Material.Filled.Stars" Color="Color.Warning" Size="Size.Small" Class="ml-1" />
+                                                    }
+                                                </div>
+                                                <MudText Typo="Typo.caption" Class="opacity-60 truncate d-block">@printer.Description</MudText>
+                                            </div>
+                                            <div class="status-dot @(printer.State.ToLower().Contains("idle") ? "bg-success" : "bg-warning") ml-2"></div>
+                                        </div>
+                                    </MudListItem>
+                                    <MudDivider />
+                                }
+                            </MudList>
+                        }
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</div>
 
 <style>
-    .selected-row {
-        background-color: var(--mud-palette-action-default-hover) !important;
+    :root {
+        --color-primary-light: rgba(var(--mud-palette-primary-rgb), 0.1);
+        --surface-light: var(--mud-palette-background-grey);
+        --surface-dark: #1a1a2e;
     }
-    .bg-light {
-        background-color: var(--mud-palette-background-grey) !important;
+
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-bottom: 2rem;
+    }
+
+    .bg-surface-light {
+        background-color: var(--surface-light) !important;
+    }
+
+    .border-b-1 {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .upload-dropzone {
+        transition: all 0.3s ease;
+        background-color: var(--color-primary-light);
+    }
+    
+    .upload-dropzone:hover {
+        background-color: rgba(var(--mud-palette-primary-rgb), 0.2);
+        border-color: var(--mud-palette-primary) !important;
+    }
+
+    .preview-container {
+        background-color: var(--surface-dark);
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .preview-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 10;
+        backdrop-filter: blur(4px);
+    }
+
+    .preview-info-tag {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(8px);
+        color: #1a1a2e;
+        display: flex;
+        align-items: center;
+        z-index: 5;
+    }
+
+    .preview-paper {
+        background: white;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .color-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .bg-gradient-rainbow {
+        background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+    }
+
+    .bg-monochrome {
+        background: linear-gradient(45deg, #000, #888, #fff);
+    }
+
+    .job-id-box {
+        background: var(--color-primary-light);
+        color: var(--mud-palette-primary);
+        font-weight: bold;
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        min-width: 45px;
+        text-align: center;
+    }
+
+    .status-scroll-container {
+        max-height: 450px;
+        overflow-y: auto;
+    }
+
+    .selected-list-item {
+        background-color: var(--color-primary-light) !important;
+        border-left: 4px solid var(--mud-palette-primary);
+    }
+
+    .printer-icon-bg {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .hover-scale {
+        transition: transform 0.2s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bg-surface-dark {
+        background-color: #0f172a !important;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 

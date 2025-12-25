@@ -123,4 +123,22 @@
   <data name="InvalidPasswordMessage" xml:space="preserve">
     <value>密码无效。</value>
   </data>
+  <data name="ManageYourNetworkPrints" xml:space="preserve">
+    <value>轻松管理您的网络打印任务</value>
+  </data>
+  <data name="LiveUpdatesActive" xml:space="preserve">
+    <value>实时更新已激活</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>离线</value>
+  </data>
+  <data name="DragAndDropOrBrowse" xml:space="preserve">
+    <value>将文件拖拽至此，或点击浏览</value>
+  </data>
+  <data name="SupportedFormatsHint" xml:space="preserve">
+    <value>支持格式：PDF, JPG, PNG (最大 10MB)</value>
+  </data>
+  <data name="SelectFileButton" xml:space="preserve">
+    <value>选择文件</value>
+  </data>
 </root>

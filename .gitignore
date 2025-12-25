@@ -419,3 +419,4 @@ FodyWeavers.xsd
 /OpenPrinterWeb/wwwroot/uploads
 appsettings.Development.json
 OpenPrinterWeb/appsettings.Development.json
+.idea
