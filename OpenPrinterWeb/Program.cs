@@ -109,7 +109,9 @@ app.Use(async (context, next) =>
         !path.StartsWith("/_framework", StringComparison.OrdinalIgnoreCase) &&
         !path.StartsWith("/_content", StringComparison.OrdinalIgnoreCase) &&
         !path.StartsWith("/_blazor", StringComparison.OrdinalIgnoreCase) &&
-        !path.Equals("/favicon.ico", StringComparison.OrdinalIgnoreCase) &&
+        !path.Equals("/favicon.png", StringComparison.OrdinalIgnoreCase) &&
+        !path.EndsWith(".css", StringComparison.OrdinalIgnoreCase) &&
+        !path.EndsWith(".js", StringComparison.OrdinalIgnoreCase) &&
         !path.Equals("/", StringComparison.OrdinalIgnoreCase) &&
         !path.Equals("/not-found", StringComparison.OrdinalIgnoreCase))
     {
