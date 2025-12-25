@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="PrintManagerTitle" xml:space="preserve">
+    <value>Print Manager</value>
+  </data>
+  <data name="UploadAndPrintHeader" xml:space="preserve">
+    <value>Upload &amp; Print</value>
+  </data>
+  <data name="SelectPdfOrImageButton" xml:space="preserve">
+    <value>Select PDF or Image</value>
+  </data>
+  <data name="PreviewLabel" xml:space="preserve">
+    <value>Preview:</value>
+  </data>
+  <data name="PrinterAndOptionsLabel" xml:space="preserve">
+    <value>Printer &amp; Options</value>
+  </data>
+  <data name="SelectPrinterLabel" xml:space="preserve">
+    <value>Select Printer</value>
+  </data>
+  <data name="ColorModeLabel" xml:space="preserve">
+    <value>Color Mode</value>
+  </data>
+  <data name="ColorModeColor" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="ColorModeBw" xml:space="preserve">
+    <value>Black &amp; White</value>
+  </data>
+  <data name="OrientationLabel" xml:space="preserve">
+    <value>Orientation</value>
+  </data>
+  <data name="OrientationPortrait" xml:space="preserve">
+    <value>Portrait</value>
+  </data>
+  <data name="OrientationLandscape" xml:space="preserve">
+    <value>Landscape</value>
+  </data>
+  <data name="CopiesLabel" xml:space="preserve">
+    <value>Copies</value>
+  </data>
+  <data name="PageRangeLabel" xml:space="preserve">
+    <value>Page Range</value>
+  </data>
+  <data name="PrintNowButton" xml:space="preserve">
+    <value>Print Now</value>
+  </data>
+  <data name="PrintingButton" xml:space="preserve">
+    <value>Printing...</value>
+  </data>
+  <data name="PrinterStatusHeader" xml:space="preserve">
+    <value>Printer Status (Jobs)</value>
+  </data>
+  <data name="WaitingForUpdates" xml:space="preserve">
+    <value>Waiting for updates...</value>
+  </data>
+  <data name="NoActiveJobs" xml:space="preserve">
+    <value>No active jobs.</value>
+  </data>
+  <data name="JobIdHeader" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="JobNameHeader" xml:space="preserve">
+    <value>Job Name</value>
+  </data>
+  <data name="JobStateHeader" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="JobUserHeader" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="AvailablePrintersHeader" xml:space="preserve">
+    <value>Available Printers</value>
+  </data>
+  <data name="LoadingPrinters" xml:space="preserve">
+    <value>Loading printers...</value>
+  </data>
+  <data name="NoPrintersFound" xml:space="preserve">
+    <value>No printers found.</value>
+  </data>
+  <data name="PrinterNameHeader" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="PrinterStatusHeaderTable" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="PrinterDefaultHeader" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="UploadingMessage" xml:space="preserve">
+    <value>Uploading file and preparing preview...</value>
+  </data>
+  <data name="FileReadyMessage" xml:space="preserve">
+    <value>File '{0}' ready for printing.</value>
+  </data>
+  <data name="UploadErrorMessage" xml:space="preserve">
+    <value>Error uploading: {0}</value>
+  </data>
+  <data name="SendingToPrinterMessage" xml:space="preserve">
+    <value>Sending to printer...</value>
+  </data>
+  <data name="PrintSuccessMessage" xml:space="preserve">
+    <value>Successfully sent {0} to printer.</value>
+  </data>
+  <data name="PrintFailureMessage" xml:space="preserve">
+    <value>Failed to print {0}. Check server logs.</value>
+  </data>
+  <data name="GenericErrorMessage" xml:space="preserve">
+    <value>Error: {0}</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginHeader" xml:space="preserve">
+    <value>OpenPrinter Login</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="InvalidPasswordMessage" xml:space="preserve">
+    <value>Invalid password.</value>
+  </data>
+</root>

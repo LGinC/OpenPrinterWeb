@@ -1,21 +1,25 @@
 @page "/"
+@attribute [Authorize]
 @using OpenPrinterWeb.Services
+@using Microsoft.Extensions.Localization
 @using Microsoft.AspNetCore.SignalR.Client
 @inject IFileUploadService FileUploadService
 @inject IPrintService PrintService
 @inject NavigationManager Navigation
+@inject IStringLocalizer<SharedResource> Localizer
+@inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<PageTitle>Print Manager</PageTitle>
+<PageTitle>@Localizer["PrintManagerTitle"]</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Print Manager</MudText>
+<MudText Typo="Typo.h3" GutterBottom="true">@Localizer["PrintManagerTitle"]</MudText>
 
 <MudGrid>
     <MudItem xs="12" md="7">
         <MudCard Elevation="2" Class="mb-4">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Upload & Print</MudText>
+                    <MudText Typo="Typo.h6">@Localizer["UploadAndPrintHeader"]</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
@@ -23,7 +27,7 @@
                     <MudFileUpload T="IBrowserFile" OnFilesChanged="HandleFileSelection" Accept=".pdf,.jpg,.jpeg,.png">
                         <ActivatorContent>
                             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CloudUpload">
-                                Select PDF or Image
+                                @Localizer["SelectPdfOrImageButton"]
                             </MudButton>
                         </ActivatorContent>
                     </MudFileUpload>
@@ -36,7 +40,7 @@
 
                 @if (!string.IsNullOrEmpty(selectedFileUrl))
                 {
-                    <MudText Typo="Typo.subtitle1" Class="mt-4 mb-2">Preview:</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mt-4 mb-2">@Localizer["PreviewLabel"]</MudText>
                     <div class="preview-background d-flex justify-content-center align-items-center bg-secondary p-4 rounded mb-4" style="min-height: 450px; overflow: hidden;">
                         <div class="preview-paper bg-white shadow-lg" style="@GetPaperStyle()">
                             <div class="preview-content h-100 w-100 d-flex justify-content-center align-items-center" style="@GetContentFilterStyle()">
@@ -55,10 +59,10 @@
                     </div>
 
                     <MudCard Elevation="0" Outlined="true" Class="mb-4 pa-4 bg-light">
-                        <MudText Typo="Typo.subtitle2" Class="mb-4">Printer & Options</MudText>
+                        <MudText Typo="Typo.subtitle2" Class="mb-4">@Localizer["PrinterAndOptionsLabel"]</MudText>
                         <MudGrid Spacing="3">
-                            <MudItem xs="12">
-                                <MudSelect T="string" Label="Select Printer" @bind-Value="selectedPrinterUri" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudItem xs="12">
+                                <MudSelect T="string" Label="@Localizer["SelectPrinterLabel"]" @bind-Value="selectedPrinterUri" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                     @if (printers != null)
                                     {
                                         @foreach (var p in printers)
@@ -69,22 +73,22 @@
                                 </MudSelect>
                             </MudItem>
                             <MudItem xs="12" sm="6">
-                                <MudSelect T="PrintColorMode" Label="Color Mode" @bind-Value="printOptions.ColorMode" Variant="Variant.Outlined">
-                                    <MudSelectItem Value="@PrintColorMode.Color">Color</MudSelectItem>
-                                    <MudSelectItem Value="@PrintColorMode.Monochrome">Black & White</MudSelectItem>
+                                <MudSelect T="PrintColorMode" Label="@Localizer["ColorModeLabel"]" @bind-Value="printOptions.ColorMode" Variant="Variant.Outlined">
+                                    <MudSelectItem Value="@PrintColorMode.Color">@Localizer["ColorModeColor"]</MudSelectItem>
+                                    <MudSelectItem Value="@PrintColorMode.Monochrome">@Localizer["ColorModeBw"]</MudSelectItem>
                                 </MudSelect>
                             </MudItem>
                             <MudItem xs="12" sm="6">
-                                <MudSelect T="PrintOrientation" Label="Orientation" @bind-Value="printOptions.Orientation" Variant="Variant.Outlined">
-                                    <MudSelectItem Value="@PrintOrientation.Portrait">Portrait</MudSelectItem>
-                                    <MudSelectItem Value="@PrintOrientation.Landscape">Landscape</MudSelectItem>
+                                <MudSelect T="PrintOrientation" Label="@Localizer["OrientationLabel"]" @bind-Value="printOptions.Orientation" Variant="Variant.Outlined">
+                                    <MudSelectItem Value="@PrintOrientation.Portrait">@Localizer["OrientationPortrait"]</MudSelectItem>
+                                    <MudSelectItem Value="@PrintOrientation.Landscape">@Localizer["OrientationLandscape"]</MudSelectItem>
                                 </MudSelect>
                             </MudItem>
                             <MudItem xs="12" sm="6">
-                                <MudNumericField @bind-Value="printOptions.Copies" Label="Copies" Variant="Variant.Outlined" Min="1" />
+                                <MudNumericField @bind-Value="printOptions.Copies" Label="@Localizer["CopiesLabel"]" Variant="Variant.Outlined" Min="1" />
                             </MudItem>
                             <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="printOptions.PageRange" Label="Page Range" Variant="Variant.Outlined" Placeholder="e.g. 1-5, 8" />
+                                <MudTextField @bind-Value="printOptions.PageRange" Label="@Localizer["PageRangeLabel"]" Variant="Variant.Outlined" Placeholder="e.g. 1-5, 8" />
                             </MudItem>
                         </MudGrid>
                     </MudCard>
@@ -93,11 +97,11 @@
                         @if (isPrinting)
                         {
                             <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                            <MudText Class="ms-2">Printing...</MudText>
+                            <MudText Class="ms-2">@Localizer["PrintingButton"]</MudText>
                         }
                         else
                         {
-                            <MudText>Print Now</MudText>
+                            <MudText>@Localizer["PrintNowButton"]</MudText>
                         }
                     </MudButton>
                 }
@@ -114,27 +118,27 @@
         <MudCard Elevation="2">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Printer Status (Jobs)</MudText>
+                    <MudText Typo="Typo.h6">@Localizer["PrinterStatusHeader"]</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
                  @if (jobs == null)
                 {
-                    <MudText><em>Waiting for updates...</em></MudText>
+                    <MudText><em>@Localizer["WaitingForUpdates"]</em></MudText>
                 }
                 else if (jobs.Length == 0)
                 {
-                    <MudText>No active jobs.</MudText>
+                    <MudText>@Localizer["NoActiveJobs"]</MudText>
                 }
                 else
                 {
                     <MudSimpleTable Style="overflow-x: auto;" Dense="true" Striped="true">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Job Name</th>
-                                <th>State</th>
-                                <th>User</th>
+                                <th>@Localizer["JobIdHeader"]</th>
+                                <th>@Localizer["JobNameHeader"]</th>
+                                <th>@Localizer["JobStateHeader"]</th>
+                                <th>@Localizer["JobUserHeader"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,26 +162,26 @@
         <MudCard Elevation="2" Class="mt-4">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Available Printers</MudText>
+                    <MudText Typo="Typo.h6">@Localizer["AvailablePrintersHeader"]</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
                 @if (printers == null)
                 {
-                    <MudText><em>Loading printers...</em></MudText>
+                    <MudText><em>@Localizer["LoadingPrinters"]</em></MudText>
                 }
                 else if (printers.Length == 0)
                 {
-                    <MudText>No printers found.</MudText>
+                    <MudText>@Localizer["NoPrintersFound"]</MudText>
                 }
                 else
                 {
                     <MudSimpleTable Style="overflow-x: auto;" Hover="true">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Status</th>
-                                <th>Default</th>
+                                <th>@Localizer["PrinterNameHeader"]</th>
+                                <th>@Localizer["PrinterStatusHeaderTable"]</th>
+                                <th>@Localizer["PrinterDefaultHeader"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -192,7 +196,7 @@
                                     <td>
                                         @if (printer.IsDefault)
                                         {
-                                            <MudChip T="string" Color="Color.Primary" Size="Size.Small">Default</MudChip>
+                                            <MudChip T="string" Color="Color.Primary" Size="Size.Small">@Localizer["PrinterDefaultHeader"]</MudChip>
                                         }
                                     </td>
                                 </tr>
@@ -228,34 +232,42 @@
     private PrinterInfo[]? printers;
     private HubConnection? hubConnection;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/printerhub"))
-            .Build();
-
-        hubConnection.On<JobStatusInfo[]>("JobUpdate", (updatedJobs) =>
+        if (firstRender)
         {
-            jobs = updatedJobs;
-            InvokeAsync(StateHasChanged);
-        });
+            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(Navigation.ToAbsoluteUri("/printerhub"), options => {
+                    options.AccessTokenProvider = () => Task.FromResult<string?>(token);
+                })
+                .Build();
 
-        await hubConnection.StartAsync();
-        
-        // Initial fetch
-        jobs = await PrintService.GetJobsAsync();
-        printers = await PrintService.GetPrintersAsync();
-        
-        if (printers != null && printers.Any())
-        {
-            selectedPrinterUri = printers.First().Uri;
+            hubConnection.On<JobStatusInfo[]>("JobUpdate", (updatedJobs) =>
+            {
+                jobs = updatedJobs;
+                InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+
+            // Initial fetch
+            jobs = await PrintService.GetJobsAsync();
+            printers = await PrintService.GetPrintersAsync();
+            
+            if (printers != null && printers.Any())
+            {
+                selectedPrinterUri = printers.First().Uri;
+            }
+            StateHasChanged();
         }
     }
 
     private async Task HandleFileSelection(InputFileChangeEventArgs e)
     {
         isUploading = true;
-        statusMessage = "Uploading file and preparing preview...";
+        statusMessage = Localizer["UploadingMessage"];
         statusClass = "alert-info";
         selectedFileUrl = null;
         selectedFilePath = null;
@@ -272,14 +284,14 @@
                 
                 var fileName = Path.GetFileName(selectedFilePath);
                 selectedFileUrl = $"uploads/{fileName}";
-                statusMessage = $"File '{file.Name}' ready for printing.";
+                statusMessage = string.Format(Localizer["FileReadyMessage"], file.Name);
                 statusClass = "alert-success";
                 Console.WriteLine($"DEBUG: File selected and prepared: {selectedFileUrl}");
             }
         }
         catch (Exception ex)
         {
-            statusMessage = $"Error uploading: {ex.Message}";
+            statusMessage = string.Format(Localizer["UploadErrorMessage"], ex.Message);
             statusClass = "alert-danger";
             Console.WriteLine($"DEBUG: Upload error: {ex.Message}");
         }
@@ -295,7 +307,7 @@
         if (string.IsNullOrEmpty(selectedFilePath) || string.IsNullOrEmpty(selectedFileName)) return;
 
         isPrinting = true;
-        statusMessage = "Sending to printer...";
+        statusMessage = Localizer["SendingToPrinterMessage"];
         statusClass = "alert-info";
         StateHasChanged();
 
@@ -306,20 +318,20 @@
 
             if (success)
             {
-                statusMessage = $"Successfully sent {selectedFileName} to printer.";
+                statusMessage = string.Format(Localizer["PrintSuccessMessage"], selectedFileName);
                 statusClass = "alert-success";
                 // Clear selection after print? 
                 // selectedFileUrl = null;
             }
             else
             {
-                statusMessage = $"Failed to print {selectedFileName}. Check server logs.";
+                statusMessage = string.Format(Localizer["PrintFailureMessage"], selectedFileName);
                 statusClass = "alert-danger";
             }
         }
         catch (Exception ex)
         {
-            statusMessage = $"Error: {ex.Message}";
+            statusMessage = string.Format(Localizer["GenericErrorMessage"], ex.Message);
             statusClass = "alert-danger";
         }
         finally

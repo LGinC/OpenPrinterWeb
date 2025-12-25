@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="PrintManagerTitle" xml:space="preserve">
+    <value>プリントマネージャー</value>
+  </data>
+  <data name="UploadAndPrintHeader" xml:space="preserve">
+    <value>アップロードと印刷</value>
+  </data>
+  <data name="SelectPdfOrImageButton" xml:space="preserve">
+    <value>PDFまたは画像を選択</value>
+  </data>
+  <data name="PreviewLabel" xml:space="preserve">
+    <value>プレビュー：</value>
+  </data>
+  <data name="PrinterAndOptionsLabel" xml:space="preserve">
+    <value>プリンターとオプション</value>
+  </data>
+  <data name="SelectPrinterLabel" xml:space="preserve">
+    <value>プリンターを選択</value>
+  </data>
+  <data name="ColorModeLabel" xml:space="preserve">
+    <value>カラーモード</value>
+  </data>
+  <data name="ColorModeColor" xml:space="preserve">
+    <value>カラー</value>
+  </data>
+  <data name="ColorModeBw" xml:space="preserve">
+    <value>モノクロ</value>
+  </data>
+  <data name="OrientationLabel" xml:space="preserve">
+    <value>向き</value>
+  </data>
+  <data name="OrientationPortrait" xml:space="preserve">
+    <value>縦</value>
+  </data>
+  <data name="OrientationLandscape" xml:space="preserve">
+    <value>横</value>
+  </data>
+  <data name="CopiesLabel" xml:space="preserve">
+    <value>部数</value>
+  </data>
+  <data name="PageRangeLabel" xml:space="preserve">
+    <value>ページ範囲</value>
+  </data>
+  <data name="PrintNowButton" xml:space="preserve">
+    <value>今すぐ印刷</value>
+  </data>
+  <data name="PrintingButton" xml:space="preserve">
+    <value>印刷中...</value>
+  </data>
+  <data name="PrinterStatusHeader" xml:space="preserve">
+    <value>プリンターの状態 (ジョブ)</value>
+  </data>
+  <data name="WaitingForUpdates" xml:space="preserve">
+    <value>更新を待機中...</value>
+  </data>
+  <data name="NoActiveJobs" xml:space="preserve">
+    <value>アクティブなジョブはありません。</value>
+  </data>
+  <data name="JobIdHeader" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="JobNameHeader" xml:space="preserve">
+    <value>ジョブ名</value>
+  </data>
+  <data name="JobStateHeader" xml:space="preserve">
+    <value>状態</value>
+  </data>
+  <data name="JobUserHeader" xml:space="preserve">
+    <value>ユーザー</value>
+  </data>
+  <data name="AvailablePrintersHeader" xml:space="preserve">
+    <value>利用可能なプリンター</value>
+  </data>
+  <data name="LoadingPrinters" xml:space="preserve">
+    <value>プリンターを読み込み中...</value>
+  </data>
+  <data name="NoPrintersFound" xml:space="preserve">
+    <value>プリンターが見つかりません。</value>
+  </data>
+  <data name="PrinterNameHeader" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="PrinterStatusHeaderTable" xml:space="preserve">
+    <value>状態</value>
+  </data>
+  <data name="PrinterDefaultHeader" xml:space="preserve">
+    <value>デフォルト</value>
+  </data>
+  <data name="UploadingMessage" xml:space="preserve">
+    <value>ファイルをアップロードしてプレビューを準備中...</value>
+  </data>
+  <data name="FileReadyMessage" xml:space="preserve">
+    <value>ファイル '{0}' の印刷準備ができました。</value>
+  </data>
+  <data name="UploadErrorMessage" xml:space="preserve">
+    <value>アップロードエラー：{0}</value>
+  </data>
+  <data name="SendingToPrinterMessage" xml:space="preserve">
+    <value>プリンターに送信中...</value>
+  </data>
+  <data name="PrintSuccessMessage" xml:space="preserve">
+    <value>{0} をプリンターに正常に送信しました。</value>
+  </data>
+  <data name="PrintFailureMessage" xml:space="preserve">
+    <value>{0} の印刷に失敗しました。サーバーログを確認してください。</value>
+  </data>
+  <data name="GenericErrorMessage" xml:space="preserve">
+    <value>エラー：{0}</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="LoginHeader" xml:space="preserve">
+    <value>OpenPrinter ログイン</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="InvalidPasswordMessage" xml:space="preserve">
+    <value>パスワードが無効です。</value>
+  </data>
+</root>

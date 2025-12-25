@@ -10,6 +10,17 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">OpenPrinterWeb</MudText>
         <MudSpacer />
+        <MudMenu Icon="@Icons.Material.Filled.Language" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+            <MudMenuItem OnClick="@(() => ChangeLanguage("en-US"))">English</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("zh-Hans"))">中文</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("ja"))">日本語</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("ru"))">Русский</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("de"))">Deutsch</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("es"))">Español</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("it"))">Italiano</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("ko"))">한국어</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ChangeLanguage("fr"))">Français</MudMenuItem>
+        </MudMenu>
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
 </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -22,11 +33,23 @@
     </MudMainContent>
 </MudLayout>
 
+@inject NavigationManager Navigation
+
 @code {
     bool _drawerOpen = true;
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private void ChangeLanguage(string culture)
+    {
+        var uri = new Uri(Navigation.Uri)
+            .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+
+        var query = $"?culture={Uri.EscapeDataString(culture)}&redirectUri={Uri.EscapeDataString(uri)}";
+
+        Navigation.NavigateTo("/Culture/Set" + query, forceLoad: true);
     }
 }

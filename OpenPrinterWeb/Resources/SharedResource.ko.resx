@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="PrintManagerTitle" xml:space="preserve">
+    <value>프린트 매니저</value>
+  </data>
+  <data name="UploadAndPrintHeader" xml:space="preserve">
+    <value>업로드 및 인쇄</value>
+  </data>
+  <data name="SelectPdfOrImageButton" xml:space="preserve">
+    <value>PDF 또는 이미지 선택</value>
+  </data>
+  <data name="PreviewLabel" xml:space="preserve">
+    <value>미리보기:</value>
+  </data>
+  <data name="PrinterAndOptionsLabel" xml:space="preserve">
+    <value>프린터 및 옵션</value>
+  </data>
+  <data name="SelectPrinterLabel" xml:space="preserve">
+    <value>프린터 선택</value>
+  </data>
+  <data name="ColorModeLabel" xml:space="preserve">
+    <value>컬러 모드</value>
+  </data>
+  <data name="ColorModeColor" xml:space="preserve">
+    <value>컬러</value>
+  </data>
+  <data name="ColorModeBw" xml:space="preserve">
+    <value>흑백</value>
+  </data>
+  <data name="OrientationLabel" xml:space="preserve">
+    <value>방향</value>
+  </data>
+  <data name="OrientationPortrait" xml:space="preserve">
+    <value>세로</value>
+  </data>
+  <data name="OrientationLandscape" xml:space="preserve">
+    <value>가로</value>
+  </data>
+  <data name="CopiesLabel" xml:space="preserve">
+    <value>복사 매수</value>
+  </data>
+  <data name="PageRangeLabel" xml:space="preserve">
+    <value>페이지 범위</value>
+  </data>
+  <data name="PrintNowButton" xml:space="preserve">
+    <value>지금 인쇄</value>
+  </data>
+  <data name="PrintingButton" xml:space="preserve">
+    <value>인쇄 중...</value>
+  </data>
+  <data name="PrinterStatusHeader" xml:space="preserve">
+    <value>프린터 상태 (작업)</value>
+  </data>
+  <data name="WaitingForUpdates" xml:space="preserve">
+    <value>업데이트 대기 중...</value>
+  </data>
+  <data name="NoActiveJobs" xml:space="preserve">
+    <value>활성 작업 없음.</value>
+  </data>
+  <data name="JobIdHeader" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="JobNameHeader" xml:space="preserve">
+    <value>작업 이름</value>
+  </data>
+  <data name="JobStateHeader" xml:space="preserve">
+    <value>상태</value>
+  </data>
+  <data name="JobUserHeader" xml:space="preserve">
+    <value>사용자</value>
+  </data>
+  <data name="AvailablePrintersHeader" xml:space="preserve">
+    <value>사용 가능한 프린터</value>
+  </data>
+  <data name="LoadingPrinters" xml:space="preserve">
+    <value>프린터 불러오는 중...</value>
+  </data>
+  <data name="NoPrintersFound" xml:space="preserve">
+    <value>프린터를 찾을 수 없습니다.</value>
+  </data>
+  <data name="PrinterNameHeader" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="PrinterStatusHeaderTable" xml:space="preserve">
+    <value>상태</value>
+  </data>
+  <data name="PrinterDefaultHeader" xml:space="preserve">
+    <value>기본값</value>
+  </data>
+  <data name="UploadingMessage" xml:space="preserve">
+    <value>파일 업로드 및 미리보기 준비 중...</value>
+  </data>
+  <data name="FileReadyMessage" xml:space="preserve">
+    <value>파일 '{0}' 인쇄 준비 완료.</value>
+  </data>
+  <data name="UploadErrorMessage" xml:space="preserve">
+    <value>업로드 오류: {0}</value>
+  </data>
+  <data name="SendingToPrinterMessage" xml:space="preserve">
+    <value>프린터로 전송 중...</value>
+  </data>
+  <data name="PrintSuccessMessage" xml:space="preserve">
+    <value>{0}을(를) 프린터로 성공적으로 전송했습니다.</value>
+  </data>
+  <data name="PrintFailureMessage" xml:space="preserve">
+    <value>{0} 인쇄 실패. 서버 로그를 확인하십시오.</value>
+  </data>
+  <data name="GenericErrorMessage" xml:space="preserve">
+    <value>오류: {0}</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+  <data name="LoginHeader" xml:space="preserve">
+    <value>OpenPrinter 로그인</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>비밀번호</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+  <data name="InvalidPasswordMessage" xml:space="preserve">
+    <value>잘못된 비밀번호입니다.</value>
+  </data>
+</root>

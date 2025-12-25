@@ -417,3 +417,5 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /OpenPrinterWeb/wwwroot/uploads
+appsettings.Development.json
+OpenPrinterWeb/appsettings.Development.json

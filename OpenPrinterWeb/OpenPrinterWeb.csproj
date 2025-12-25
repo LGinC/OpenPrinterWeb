@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.1" />
       <PackageReference Include="MudBlazor" Version="8.15.0" />
       <PackageReference Include="SharpIppNext" Version="2.1.6" />

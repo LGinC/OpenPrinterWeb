@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="PrintManagerTitle" xml:space="preserve">
+    <value>Druckmanager</value>
+  </data>
+  <data name="UploadAndPrintHeader" xml:space="preserve">
+    <value>Hochladen und Drucken</value>
+  </data>
+  <data name="SelectPdfOrImageButton" xml:space="preserve">
+    <value>PDF oder Bild auswählen</value>
+  </data>
+  <data name="PreviewLabel" xml:space="preserve">
+    <value>Vorschau:</value>
+  </data>
+  <data name="PrinterAndOptionsLabel" xml:space="preserve">
+    <value>Drucker und Optionen</value>
+  </data>
+  <data name="SelectPrinterLabel" xml:space="preserve">
+    <value>Drucker auswählen</value>
+  </data>
+  <data name="ColorModeLabel" xml:space="preserve">
+    <value>Farbmodus</value>
+  </data>
+  <data name="ColorModeColor" xml:space="preserve">
+    <value>Farbe</value>
+  </data>
+  <data name="ColorModeBw" xml:space="preserve">
+    <value>Schwarz-Weiß</value>
+  </data>
+  <data name="OrientationLabel" xml:space="preserve">
+    <value>Ausrichtung</value>
+  </data>
+  <data name="OrientationPortrait" xml:space="preserve">
+    <value>Hochformat</value>
+  </data>
+  <data name="OrientationLandscape" xml:space="preserve">
+    <value>Querformat</value>
+  </data>
+  <data name="CopiesLabel" xml:space="preserve">
+    <value>Kopien</value>
+  </data>
+  <data name="PageRangeLabel" xml:space="preserve">
+    <value>Seitenbereich</value>
+  </data>
+  <data name="PrintNowButton" xml:space="preserve">
+    <value>Jetzt drucken</value>
+  </data>
+  <data name="PrintingButton" xml:space="preserve">
+    <value>Drucken...</value>
+  </data>
+  <data name="PrinterStatusHeader" xml:space="preserve">
+    <value>Druckerstatus (Aufträge)</value>
+  </data>
+  <data name="WaitingForUpdates" xml:space="preserve">
+    <value>Warte auf Updates...</value>
+  </data>
+  <data name="NoActiveJobs" xml:space="preserve">
+    <value>Keine aktiven Aufträge.</value>
+  </data>
+  <data name="JobIdHeader" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="JobNameHeader" xml:space="preserve">
+    <value>Auftragsname</value>
+  </data>
+  <data name="JobStateHeader" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="JobUserHeader" xml:space="preserve">
+    <value>Benutzer</value>
+  </data>
+  <data name="AvailablePrintersHeader" xml:space="preserve">
+    <value>Verfügbare Drucker</value>
+  </data>
+  <data name="LoadingPrinters" xml:space="preserve">
+    <value>Lade Drucker...</value>
+  </data>
+  <data name="NoPrintersFound" xml:space="preserve">
+    <value>Keine Drucker gefunden.</value>
+  </data>
+  <data name="PrinterNameHeader" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="PrinterStatusHeaderTable" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="PrinterDefaultHeader" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="UploadingMessage" xml:space="preserve">
+    <value>Datei wird hochgeladen und Vorschau vorbereitet...</value>
+  </data>
+  <data name="FileReadyMessage" xml:space="preserve">
+    <value>Datei '{0}' bereit zum Drucken.</value>
+  </data>
+  <data name="UploadErrorMessage" xml:space="preserve">
+    <value>Fehler beim Hochladen: {0}</value>
+  </data>
+  <data name="SendingToPrinterMessage" xml:space="preserve">
+    <value>An Drucker senden...</value>
+  </data>
+  <data name="PrintSuccessMessage" xml:space="preserve">
+    <value>{0} erfolgreich an Drucker gesendet.</value>
+  </data>
+  <data name="PrintFailureMessage" xml:space="preserve">
+    <value>Drucken von {0} fehlgeschlagen. Serverprotokolle prüfen.</value>
+  </data>
+  <data name="GenericErrorMessage" xml:space="preserve">
+    <value>Fehler: {0}</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Anmelden</value>
+  </data>
+  <data name="LoginHeader" xml:space="preserve">
+    <value>OpenPrinter-Anmeldung</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>Passwort</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>Anmelden</value>
+  </data>
+  <data name="InvalidPasswordMessage" xml:space="preserve">
+    <value>Ungültiges Passwort.</value>
+  </data>
+</root>

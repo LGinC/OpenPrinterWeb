@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="PrintManagerTitle" xml:space="preserve">
+    <value>打印管理器</value>
+  </data>
+  <data name="UploadAndPrintHeader" xml:space="preserve">
+    <value>上传并打印</value>
+  </data>
+  <data name="SelectPdfOrImageButton" xml:space="preserve">
+    <value>选择 PDF 或图片</value>
+  </data>
+  <data name="PreviewLabel" xml:space="preserve">
+    <value>预览：</value>
+  </data>
+  <data name="PrinterAndOptionsLabel" xml:space="preserve">
+    <value>打印机与选项</value>
+  </data>
+  <data name="SelectPrinterLabel" xml:space="preserve">
+    <value>选择打印机</value>
+  </data>
+  <data name="ColorModeLabel" xml:space="preserve">
+    <value>色彩模式</value>
+  </data>
+  <data name="ColorModeColor" xml:space="preserve">
+    <value>彩色</value>
+  </data>
+  <data name="ColorModeBw" xml:space="preserve">
+    <value>黑白</value>
+  </data>
+  <data name="OrientationLabel" xml:space="preserve">
+    <value>方向</value>
+  </data>
+  <data name="OrientationPortrait" xml:space="preserve">
+    <value>纵向</value>
+  </data>
+  <data name="OrientationLandscape" xml:space="preserve">
+    <value>横向</value>
+  </data>
+  <data name="CopiesLabel" xml:space="preserve">
+    <value>份数</value>
+  </data>
+  <data name="PageRangeLabel" xml:space="preserve">
+    <value>页码范围</value>
+  </data>
+  <data name="PrintNowButton" xml:space="preserve">
+    <value>立即打印</value>
+  </data>
+  <data name="PrintingButton" xml:space="preserve">
+    <value>正在打印...</value>
+  </data>
+  <data name="PrinterStatusHeader" xml:space="preserve">
+    <value>打印机状态 (任务)</value>
+  </data>
+  <data name="WaitingForUpdates" xml:space="preserve">
+    <value>等待更新...</value>
+  </data>
+  <data name="NoActiveJobs" xml:space="preserve">
+    <value>暂无活动任务。</value>
+  </data>
+  <data name="JobIdHeader" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="JobNameHeader" xml:space="preserve">
+    <value>任务名称</value>
+  </data>
+  <data name="JobStateHeader" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="JobUserHeader" xml:space="preserve">
+    <value>用户</value>
+  </data>
+  <data name="AvailablePrintersHeader" xml:space="preserve">
+    <value>可用打印机</value>
+  </data>
+  <data name="LoadingPrinters" xml:space="preserve">
+    <value>正在加载打印机...</value>
+  </data>
+  <data name="NoPrintersFound" xml:space="preserve">
+    <value>未找到打印机。</value>
+  </data>
+  <data name="PrinterNameHeader" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="PrinterStatusHeaderTable" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="PrinterDefaultHeader" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="UploadingMessage" xml:space="preserve">
+    <value>正在上传文件并准备预览...</value>
+  </data>
+  <data name="FileReadyMessage" xml:space="preserve">
+    <value>文件 '{0}' 已准备好打印。</value>
+  </data>
+  <data name="UploadErrorMessage" xml:space="preserve">
+    <value>上传错误：{0}</value>
+  </data>
+  <data name="SendingToPrinterMessage" xml:space="preserve">
+    <value>正在发送至打印机...</value>
+  </data>
+  <data name="PrintSuccessMessage" xml:space="preserve">
+    <value>成功发送 {0} 至打印机。</value>
+  </data>
+  <data name="PrintFailureMessage" xml:space="preserve">
+    <value>打印 {0} 失败。请检查服务器日志。</value>
+  </data>
+  <data name="GenericErrorMessage" xml:space="preserve">
+    <value>错误：{0}</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="LoginHeader" xml:space="preserve">
+    <value>OpenPrinter 登录</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="InvalidPasswordMessage" xml:space="preserve">
+    <value>密码无效。</value>
+  </data>
+</root>

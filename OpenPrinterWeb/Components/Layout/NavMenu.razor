@@ -1,3 +1,6 @@
-﻿<MudNavMenu>
-    <MudNavLink href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LocalPrintshop">Print Manager</MudNavLink>
+﻿@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<MudNavMenu>
+    <MudNavLink href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LocalPrintshop">@Localizer["PrintManagerTitle"]</MudNavLink>
 </MudNavMenu>
