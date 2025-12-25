@@ -26,7 +26,7 @@
             <MudCardContent>
                 <MudTextField T="string" Label="@Localizer["PasswordLabel"]" @bind-Value="password" 
                               InputType="InputType.Password" Variant="Variant.Outlined" 
-                              OnKeyDown="HandleKeyDown" FullWidth="true"
+                              OnKeyDown="HandleKeyDown" FullWidth="true" Immediate="true"
                               Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Lock"
                               Class="mb-4 rounded-lg" AutoFocus="true" />
                 
@@ -52,9 +52,7 @@
                 </MudButton>
             </MudCardActions>
 
-            <div class="mt-8 text-center opacity-40">
-                <MudText Typo="Typo.caption">© 2025 OpenPrinter. Secure Network Management.</MudText>
-            </div>
+           
         </MudCard>
     </div>
 </div>
@@ -135,6 +133,10 @@
 </style>
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? returnUrl { get; set; }
+
     private string password = "";
     private string errorMessage = "";
     private bool isLoading = false;
@@ -167,7 +169,15 @@
                     await JSRuntime.InvokeVoidAsync("eval", $"document.cookie = 'authToken={result.Token}; path=/; max-age=43200; SameSite=Strict'");
                     
                     ((JwtAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token);
-                    Navigation.NavigateTo("/");
+                    
+                    if (!string.IsNullOrEmpty(returnUrl))
+                    {
+                        Navigation.NavigateTo(returnUrl);
+                    }
+                    else
+                    {
+                        Navigation.NavigateTo("/");
+                    }
                 }
             }
             else

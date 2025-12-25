@@ -3,6 +3,14 @@
 @code {
     protected override void OnInitialized()
     {
-        Navigation.NavigateTo("login");
+        var returnUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
+        if (string.IsNullOrWhiteSpace(returnUrl) || returnUrl.StartsWith("login", StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo("login");
+        }
+        else
+        {
+            Navigation.NavigateTo($"login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+        }
     }
 }

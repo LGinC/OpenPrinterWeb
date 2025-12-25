@@ -108,12 +108,24 @@ app.Use(async (context, next) =>
         !path.StartsWith("/api/auth", StringComparison.OrdinalIgnoreCase) &&
         !path.StartsWith("/_framework", StringComparison.OrdinalIgnoreCase) &&
         !path.StartsWith("/_content", StringComparison.OrdinalIgnoreCase) &&
+        !path.StartsWith("/_blazor", StringComparison.OrdinalIgnoreCase) &&
         !path.Equals("/favicon.ico", StringComparison.OrdinalIgnoreCase) &&
-        !path.Equals("/", StringComparison.OrdinalIgnoreCase)) // Allow root for redirect logic
+        !path.Equals("/", StringComparison.OrdinalIgnoreCase) &&
+        !path.Equals("/not-found", StringComparison.OrdinalIgnoreCase))
     {
         if (!context.User.Identity?.IsAuthenticated ?? true)
         {
-            context.Response.StatusCode = 401;
+            // Only redirect to login for GET requests that don't look like static assets
+            bool isPageRequest = context.Request.Method == "GET" && !path.Contains('.');
+            
+            if (isPageRequest)
+            {
+                context.Response.Redirect($"/login?returnUrl={Uri.EscapeDataString(path)}");
+            }
+            else
+            {
+                context.Response.StatusCode = 401;
+            }
             return;
         }
     }
