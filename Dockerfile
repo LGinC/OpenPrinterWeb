@@ -32,6 +32,11 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+# Create data directory and set permissions for the non-root user
+USER root
+RUN mkdir -p /app/data && chown -R $APP_UID:$APP_UID /app/data
+USER $APP_UID
+
 # Support graceful exit: Increase shutdown timeout for SignalR and background tasks
 ENV DOTNET_SHUTDOWN_TIMEOUT_SECONDS=30
 

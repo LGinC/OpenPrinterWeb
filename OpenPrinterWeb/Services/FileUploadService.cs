@@ -16,7 +16,7 @@ namespace OpenPrinterWeb.Services
 
         public async Task<string> UploadFileAsync(Stream fileStream, string fileName)
         {
-            var uploadPath = Path.Combine(_environment.WebRootPath, "uploads");
+            var uploadPath = Path.Combine(_environment.ContentRootPath, "data", "uploads");
             if (!Directory.Exists(uploadPath))
             {
                 Directory.CreateDirectory(uploadPath);

@@ -145,6 +145,19 @@ app.Use(async (context, next) =>
 });
 
 app.UseStaticFiles();
+
+// Serve files from the persistent uploads directory
+var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "data", "uploads");
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
+
 app.MapStaticAssets();
 
 app.MapControllers();

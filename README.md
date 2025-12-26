@@ -82,7 +82,7 @@ Key settings in `appsettings.json` can be overridden via environment variables:
 - `Passwords`: Comma-separated list of allowed passwords for login.
 - `JwtSettings__Secret`: A secure key used to sign JWT tokens. **Must be at least 32 characters (256 bits) long.**
 
-> **Note**: Mounting `/app/data` is highly recommended to persist encryption keys. Without this, users will be logged out and Antiforgery tokens will become invalid every time the container restarts.
+> **Note**: Mounting `/app/data` is highly recommended to persist encryption keys and uploaded print files. Without this, users will be logged out and all uploaded documents will be lost every time the container restarts.
 
 ## 🌐 Localization
 
