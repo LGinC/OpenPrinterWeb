@@ -21,7 +21,7 @@ OpenPrinterWeb is a modern, cross-platform Blazor Server application designed fo
 - **Infrastructure**: Dockerized with support for graceful shutdowns (`SIGTERM`) and persistent data protection keys.
 - **CI/CD**: GitHub Actions for automated building and publishing to GHCR.io.
 
-## �️ About IPP (Internet Printing Protocol)
+## 🖨️ About IPP (Internet Printing Protocol)
 
 IPP is a standard network protocol for remote printing and managing print jobs. Most modern network printers support IPP natively.
 
@@ -31,7 +31,7 @@ If you have an older USB printer, you can still use this application by:
 2. Installing **CUPS** (Common Unix Printing System) on that host.
 3. Sharing the printer through CUPS, which will provide an IPP URI (usually `ipp://<host-ip>:631/printers/<printer-name>`) compatible with OpenPrinterWeb.
 
-## �📦 Deployment
+## 📦 Deployment
 
 ### Prerequisites
 
