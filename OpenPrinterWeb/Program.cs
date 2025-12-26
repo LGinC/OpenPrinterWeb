@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Localization;
 using System.Text;
 using System.Security.Claims;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,15 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
+
+var dataProtectionPath = Path.Combine(builder.Environment.ContentRootPath, "data", "keys");
+if (!Directory.Exists(dataProtectionPath))
+{
+    Directory.CreateDirectory(dataProtectionPath);
+}
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
+    .SetApplicationName("OpenPrinterWeb");
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secret = jwtSettings["Secret"] ?? "OpenPrinterWeb_Super_Secret_Key_2025_Secure";
