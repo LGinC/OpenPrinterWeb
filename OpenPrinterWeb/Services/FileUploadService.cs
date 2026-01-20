@@ -8,24 +8,26 @@ namespace OpenPrinterWeb.Services
     public class FileUploadService : IFileUploadService
     {
         private readonly IWebHostEnvironment _environment;
+        private readonly IFileSystem _fileSystem;
 
-        public FileUploadService(IWebHostEnvironment environment)
+        public FileUploadService(IWebHostEnvironment environment, IFileSystem fileSystem)
         {
             _environment = environment;
+            _fileSystem = fileSystem;
         }
 
         public async Task<string> UploadFileAsync(Stream fileStream, string fileName)
         {
             var uploadPath = Path.Combine(_environment.ContentRootPath, "data", "uploads");
-            if (!Directory.Exists(uploadPath))
+            if (!_fileSystem.DirectoryExists(uploadPath))
             {
-                Directory.CreateDirectory(uploadPath);
+                _fileSystem.CreateDirectory(uploadPath);
             }
 
             var uniqueFileName = $"{Guid.NewGuid()}_{fileName}";
             var filePath = Path.Combine(uploadPath, uniqueFileName);
 
-            using (var fileStreamOutput = new FileStream(filePath, FileMode.Create))
+            using (var fileStreamOutput = _fileSystem.CreateFile(filePath))
             {
                 await fileStream.CopyToAsync(fileStreamOutput);
             }

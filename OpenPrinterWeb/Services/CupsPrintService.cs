@@ -14,12 +14,12 @@ namespace OpenPrinterWeb.Services
     public class CupsPrintService : IPrintService
     {
         private readonly string _printerUri;
-        private readonly SharpIppClient _client;
+        private readonly ISharpIppClientWrapper _client;
 
-        public CupsPrintService(IConfiguration configuration)
+        public CupsPrintService(IConfiguration configuration, ISharpIppClientWrapper client)
         {
             _printerUri = configuration["PrinterSettings:Uri"] ?? "ipp://192.168.2.108:631/printers/default";
-            _client = new SharpIppClient();
+            _client = client;
         }
 
         public async Task<bool> PrintDocumentAsync(string jobName, Stream documentStream, string? printerUri = null, PrintOptions? options = null)

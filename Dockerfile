@@ -3,7 +3,7 @@
 # This stage is used when running from VS in fast mode (Default for Debug config)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS base
 # Install ICU libs for localization support
-RUN apk add --no-cache icu-libs
+RUN apk add --no-cache icu-libs libreoffice openjdk11-jre ttf-dejavu ttf-liberation
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 USER $APP_UID

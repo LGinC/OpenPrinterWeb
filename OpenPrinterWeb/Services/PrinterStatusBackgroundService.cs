@@ -12,12 +12,20 @@ namespace OpenPrinterWeb.Services
     {
         private readonly IHubContext<PrinterHub> _hubContext;
         private readonly IServiceProvider _serviceProvider;
-        private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
+        private readonly TimeSpan _period;
+        private PeriodicTimer _timer;
 
-        public PrinterStatusBackgroundService(IHubContext<PrinterHub> hubContext, IServiceProvider serviceProvider)
+        public PrinterStatusBackgroundService(IHubContext<PrinterHub> hubContext, IServiceProvider serviceProvider) 
+            : this(hubContext, serviceProvider, TimeSpan.FromSeconds(5))
+        {
+        }
+
+        public PrinterStatusBackgroundService(IHubContext<PrinterHub> hubContext, IServiceProvider serviceProvider, TimeSpan period)
         {
             _hubContext = hubContext;
             _serviceProvider = serviceProvider;
+            _period = period;
+            _timer = new PeriodicTimer(_period);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

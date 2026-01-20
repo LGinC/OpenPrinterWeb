@@ -22,8 +22,13 @@ builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddSingleton<IPrintService, CupsPrintService>();
+builder.Services.AddSingleton<ISharpIppClientWrapper, SharpIppClientAdapter>();
+builder.Services.AddSingleton<IProcessExecutor, ProcessExecutor>();
+builder.Services.AddSingleton<IFileSystem, PhysicalFileSystem>();
+builder.Services.AddSingleton<IPdfConverter, LibreOfficePdfConverter>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddHostedService<PrinterStatusBackgroundService>();
+builder.Services.AddHostedService<FileCleanupBackgroundService>();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();

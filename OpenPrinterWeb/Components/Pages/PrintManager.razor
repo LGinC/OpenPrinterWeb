@@ -5,6 +5,7 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @inject IFileUploadService FileUploadService
 @inject IPrintService PrintService
+@inject IPdfConverter PdfConverter
 @inject NavigationManager Navigation
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IJSRuntime JSRuntime
@@ -43,7 +44,7 @@
                             <MudText Typo="Typo.h6" Color="Color.Primary" GutterBottom="true">@Localizer["DragAndDropOrBrowse"]</MudText>
                             <MudText Typo="Typo.body2" Class="mb-6 opacity-60">@Localizer["SupportedFormatsHint"]</MudText>
                             
-                            <MudFileUpload T="IBrowserFile" OnFilesChanged="HandleFileSelection" Accept=".pdf,.jpg,.jpeg,.png">
+                            <MudFileUpload T="IBrowserFile" OnFilesChanged="HandleFileSelection" Accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
                                 <ActivatorContent>
                                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="px-10 rounded-pill shadow-lg">
                                         @Localizer["SelectFileButton"]
@@ -71,9 +72,18 @@
                                                 {
                                                     <embed src="@($"{selectedFileUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH")" type="application/pdf" style="width: 100%; height: 100%; display: block;" />
                                                 }
-                                                else
+                                                else if (selectedFileUrl.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || 
+                                                         selectedFileUrl.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) || 
+                                                         selectedFileUrl.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                                                 {
                                                     <img src="@selectedFileUrl" alt="Preview" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="d-flex flex-column align-center justify-center" style="height: 100%; width: 100%; color: #555;">
+                                                        <MudIcon Icon="@Icons.Material.Filled.SnippetFolder" Size="Size.Large" Style="font-size: 6rem; opacity: 0.5;" />
+                                                        <MudText Typo="Typo.h6" Class="mt-4">@Localizer["DocumentReadyToPrint"]</MudText>
+                                                    </div>
                                                 }
                                             </div>
                                         </div>
@@ -496,7 +506,26 @@
                 
                 var fileName = Path.GetFileName(selectedFilePath);
                 selectedFileUrl = $"uploads/{fileName}";
-                statusMessage = string.Format(Localizer["FileReadyMessage"], file.Name);
+
+                // Convert Office files to PDF immediately for preview
+                var extension = Path.GetExtension(selectedFileName).ToLower();
+                if (extension == ".doc" || extension == ".docx" || 
+                    extension == ".xls" || extension == ".xlsx" || 
+                    extension == ".ppt" || extension == ".pptx")
+                {
+                    statusMessage = "Converting to PDF for preview...";
+                    StateHasChanged();
+                    
+                    var pdfPath = await PdfConverter.ConvertToPdfAsync(selectedFilePath);
+                    var pdfFileName = Path.GetFileName(pdfPath);
+                    selectedFileUrl = $"uploads/{pdfFileName}"; // Update preview URL to the converted PDF
+                    
+                    // Update internal path to point to the PDF for printing later
+                    selectedFilePath = pdfPath; 
+                    selectedFileName = pdfFileName;
+                }
+
+                statusMessage = string.Format(Localizer["FileReadyMessage"], selectedFileName);
                 statusClass = "alert-success";
                 Console.WriteLine($"DEBUG: File selected and prepared: {selectedFileUrl}");
             }
@@ -525,6 +554,7 @@
 
         try
         {
+            // File is already converted if needed during selection
             using var fileStream = File.OpenRead(selectedFilePath);
             var success = await PrintService.PrintDocumentAsync(selectedFileName, fileStream, selectedPrinterUri, printOptions);
 
@@ -532,8 +562,6 @@
             {
                 statusMessage = string.Format(Localizer["PrintSuccessMessage"], selectedFileName);
                 statusClass = "alert-success";
-                // Clear selection after print? 
-                // selectedFileUrl = null;
             }
             else
             {
