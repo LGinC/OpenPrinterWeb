@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging; // Add this
 using Moq;
 using Xunit;
 using OpenPrinterWeb.Services;
@@ -15,16 +16,18 @@ namespace OpenPrinterWeb.Tests
     {
         private readonly Mock<IConfiguration> _mockConfig;
         private readonly Mock<ISharpIppClientWrapper> _mockClient;
+        private readonly Mock<ILogger<CupsPrintService>> _mockLogger; // Add this
         private readonly CupsPrintService _service;
 
         public CupsPrintServiceTests()
         {
             _mockConfig = new Mock<IConfiguration>();
             _mockClient = new Mock<ISharpIppClientWrapper>();
+            _mockLogger = new Mock<ILogger<CupsPrintService>>(); // Add this
             
             _mockConfig.Setup(c => c["PrinterSettings:Uri"]).Returns("ipp://localhost:631/printers/test");
 
-            _service = new CupsPrintService(_mockConfig.Object, _mockClient.Object);
+            _service = new CupsPrintService(_mockConfig.Object, _mockClient.Object, _mockLogger.Object); // Update this
         }
 
         [Fact]

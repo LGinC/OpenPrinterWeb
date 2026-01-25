@@ -13,6 +13,13 @@ namespace OpenPrinterWeb.Services
         private readonly string _printerUri =
             configuration["PrinterSettings:Uri"] ?? throw new ArgumentNullException("PrinterSettings:Uri");
 
+        public event Action<JobStatusInfo[]>? OnJobUpdate;
+
+        public void BroadcastJobUpdate(JobStatusInfo[] jobs)
+        {
+            OnJobUpdate?.Invoke(jobs);
+        }
+
         public async Task<bool> PrintDocumentAsync(string jobName, Stream documentStream, string? printerUri = null,
             PrintOptions? options = null)
         {

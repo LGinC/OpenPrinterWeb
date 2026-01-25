@@ -1,28 +1,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
-using OpenPrinterWeb.Hubs;
+using Microsoft.Extensions.DependencyInjection; // Ensure this is present
 using OpenPrinterWeb.Services;
 
 namespace OpenPrinterWeb.Services
 {
     public class PrinterStatusBackgroundService : BackgroundService
     {
-        private readonly IHubContext<PrinterHub> _hubContext;
+        // Removed IHubContext since we are using native C# events
         private readonly IServiceProvider _serviceProvider;
         private readonly TimeSpan _period;
         private PeriodicTimer _timer;
 
-        public PrinterStatusBackgroundService(IHubContext<PrinterHub> hubContext, IServiceProvider serviceProvider) 
-            : this(hubContext, serviceProvider, TimeSpan.FromSeconds(5))
+        public PrinterStatusBackgroundService(IServiceProvider serviceProvider) 
+            : this(serviceProvider, TimeSpan.FromSeconds(5))
         {
         }
 
-        public PrinterStatusBackgroundService(IHubContext<PrinterHub> hubContext, IServiceProvider serviceProvider, TimeSpan period)
+        public PrinterStatusBackgroundService(IServiceProvider serviceProvider, TimeSpan period)
         {
-            _hubContext = hubContext;
             _serviceProvider = serviceProvider;
             _period = period;
             _timer = new PeriodicTimer(_period);
@@ -34,12 +32,16 @@ namespace OpenPrinterWeb.Services
             {
                 try
                 {
+                    // Use the singleton instance directly if possible, or resolve from scope if necessary.
+                    // Since IPrintService is Singleton in Program.cs, we can resolve it once or per tick.
+                    // Creating a scope is safer for dependencies.
                     using (var scope = _serviceProvider.CreateScope())
                     {
                         var printService = scope.ServiceProvider.GetRequiredService<IPrintService>();
                         var jobs = await printService.GetJobsAsync();
 
-                        await _hubContext.Clients.All.SendAsync("JobUpdate", jobs, stoppingToken);
+                        // Broadcast via C# event instead of SignalR
+                        printService.BroadcastJobUpdate(jobs);
                     }
                 }
                 catch (Exception ex)

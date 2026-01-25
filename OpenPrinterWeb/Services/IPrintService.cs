@@ -6,6 +6,9 @@ namespace OpenPrinterWeb.Services
 {
     public interface IPrintService
     {
+        event Action<JobStatusInfo[]>? OnJobUpdate;
+        void BroadcastJobUpdate(JobStatusInfo[] jobs);
+
         Task<bool> PrintDocumentAsync(string jobName, Stream documentStream, string? printerUri = null, PrintOptions? options = null);
         Task<JobStatusInfo[]> GetJobsAsync();
         Task<PrinterInfo[]> GetPrintersAsync();

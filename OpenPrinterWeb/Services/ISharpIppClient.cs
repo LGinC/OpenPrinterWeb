@@ -14,15 +14,12 @@ namespace OpenPrinterWeb.Services
 
     public class SharpIppClientAdapter : ISharpIppClientWrapper
     {
-        private readonly SharpIppClient _client;
-
-        public SharpIppClientAdapter()
-        {
-            _client = new SharpIppClient();
-        }
+        private readonly SharpIppClient _client = new();
 
         public Task<PrintJobResponse> PrintJobAsync(PrintJobRequest request) => _client.PrintJobAsync(request);
         public Task<GetJobsResponse> GetJobsAsync(GetJobsRequest request) => _client.GetJobsAsync(request);
-        public Task<CUPSGetPrintersResponse> GetCUPSPrintersAsync(CUPSGetPrintersRequest request) => _client.GetCUPSPrintersAsync(request);
+
+        public Task<CUPSGetPrintersResponse> GetCUPSPrintersAsync(CUPSGetPrintersRequest request) =>
+            _client.GetCUPSPrintersAsync(request);
     }
 }

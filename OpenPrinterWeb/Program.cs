@@ -1,6 +1,5 @@
 using OpenPrinterWeb.Components;
 using OpenPrinterWeb.Services;
-using OpenPrinterWeb.Hubs;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +17,6 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
-builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddSingleton<IPrintService, CupsPrintService>();
@@ -114,17 +112,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Branch SignalR to bypass Antiforgery and other middleware
-app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/printerhub"), subApp =>
-{
-    subApp.UseRouting();
-    subApp.UseEndpoints(endpoints =>
-    {
-        endpoints.MapHub<PrinterHub>("");
-    });
-});
-
 app.UseAntiforgery();
 
 // Protect specific static files (uploads and others)

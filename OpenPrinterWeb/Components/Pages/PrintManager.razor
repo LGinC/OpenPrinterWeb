@@ -2,14 +2,13 @@
 @attribute [Authorize]
 @using OpenPrinterWeb.Services
 @using Microsoft.Extensions.Localization
-@using Microsoft.AspNetCore.SignalR.Client
 @inject IFileUploadService FileUploadService
 @inject IPrintService PrintService
 @inject IPdfConverter PdfConverter
 @inject NavigationManager Navigation
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IJSRuntime JSRuntime
-@implements IAsyncDisposable
+@implements IDisposable
 
 <div class="dashboard-container">
     <div class="d-flex align-center mb-6">
@@ -19,8 +18,9 @@
             <MudText Typo="Typo.subtitle2" Color="Color.Secondary">@Localizer["ManageYourNetworkPrints"]</MudText>
         </div>
         <MudSpacer />
-        <MudChip T="string" Icon="@Icons.Material.Filled.FiberManualRecord" Color="@(hubConnection?.State == HubConnectionState.Connected ? Color.Success : Color.Error)" Variant="Variant.Text">
-            @(hubConnection?.State == HubConnectionState.Connected ? Localizer["LiveUpdatesActive"] : Localizer["Offline"])
+        @* Simplified Live Badge - No SignalR connection state to track *@
+        <MudChip T="string" Icon="@Icons.Material.Filled.FiberManualRecord" Color="Color.Success" Variant="Variant.Text">
+            @Localizer["LiveUpdatesActive"]
         </MudChip>
     </div>
 
@@ -452,38 +452,36 @@
     private PrintOptions printOptions = new();
     private JobStatusInfo[]? jobs;
     private PrinterInfo[]? printers;
-    private HubConnection? hubConnection;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        // Subscribe to server-side events
+        PrintService.OnJobUpdate += HandleJobUpdate;
+
+        // Initial fetch
+        jobs = await PrintService.GetJobsAsync();
+        printers = await PrintService.GetPrintersAsync();
+        
+        if (printers != null && printers.Any())
         {
-            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
-            
-            hubConnection = new HubConnectionBuilder()
-                .WithUrl(Navigation.ToAbsoluteUri("/printerhub"), options => {
-                    options.AccessTokenProvider = () => Task.FromResult<string?>(token);
-                })
-                .Build();
-
-            hubConnection.On<JobStatusInfo[]>("JobUpdate", (updatedJobs) =>
-            {
-                jobs = updatedJobs;
-                InvokeAsync(StateHasChanged);
-            });
-
-            await hubConnection.StartAsync();
-
-            // Initial fetch
-            jobs = await PrintService.GetJobsAsync();
-            printers = await PrintService.GetPrintersAsync();
-            
-            if (printers != null && printers.Any())
-            {
-                selectedPrinterUri = printers.First().Uri;
-            }
-            StateHasChanged();
+            selectedPrinterUri = printers.First().Uri;
         }
+    }
+
+    private void HandleJobUpdate(JobStatusInfo[] updatedJobs)
+    {
+        // Dispatch to UI thread
+        InvokeAsync(() =>
+        {
+            jobs = updatedJobs;
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe to prevent memory leaks
+        PrintService.OnJobUpdate -= HandleJobUpdate;
     }
 
     private async Task HandleFileSelection(InputFileChangeEventArgs e)
@@ -646,11 +644,9 @@
         return string.Join("; ", styles);
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        if (hubConnection is not null)
-        {
-            await hubConnection.DisposeAsync();
-        }
+        Dispose();
+        return ValueTask.CompletedTask;
     }
 }

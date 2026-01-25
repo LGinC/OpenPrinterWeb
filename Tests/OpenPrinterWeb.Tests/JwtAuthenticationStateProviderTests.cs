@@ -33,31 +33,33 @@ namespace OpenPrinterWeb.Tests
         public async Task GetAuthenticationStateAsync_ShouldReturnAnonymous_WhenNoToken()
         {
             // Arrange
-            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns((HttpContext)null);
-            _mockJsRuntime.Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
-                .ReturnsAsync((string)null);
+            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns((HttpContext?)null);
+            _mockJsRuntime.Setup(x => x.InvokeAsync<string?>("localStorage.getItem", It.IsAny<object[]>()))
+                .ReturnsAsync((string?)null);
 
             // Act
             var state = await _provider.GetAuthenticationStateAsync();
 
             // Assert
-            Assert.False(state.User.Identity.IsAuthenticated);
+            Assert.NotNull(state.User.Identity);
+            Assert.False(state.User.Identity!.IsAuthenticated);
         }
 
         [Fact]
         public async Task GetAuthenticationStateAsync_ShouldReturnAuthenticated_WhenTokenExistsInLocalStorage()
         {
             // Arrange
-            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns((HttpContext)null);
+            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns((HttpContext?)null);
             var token = GenerateTestJwt();
-            _mockJsRuntime.Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            _mockJsRuntime.Setup(x => x.InvokeAsync<string?>("localStorage.getItem", It.IsAny<object[]>()))
                 .ReturnsAsync(token);
 
             // Act
             var state = await _provider.GetAuthenticationStateAsync();
 
             // Assert
-            Assert.True(state.User.Identity.IsAuthenticated);
+            Assert.NotNull(state.User.Identity);
+            Assert.True(state.User.Identity!.IsAuthenticated);
             // JwtSecurityTokenHandler might map ClaimTypes.Name to "unique_name", so Identity.Name might be null if not mapped back.
             // We check for presence of the claim value.
             Assert.Contains(state.User.Claims, c => c.Value == "testuser");
@@ -75,8 +77,9 @@ namespace OpenPrinterWeb.Tests
             var state = await _provider.GetAuthenticationStateAsync();
 
             // Assert
-            Assert.True(state.User.Identity.IsAuthenticated);
-            Assert.Equal("httpUser", state.User.Identity.Name);
+            Assert.NotNull(state.User.Identity);
+            Assert.True(state.User.Identity!.IsAuthenticated);
+            Assert.Equal("httpUser", state.User.Identity!.Name);
             // Should verify localStorage was NOT called if HttpContext is used (optimization check, optional)
         }
 

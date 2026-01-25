@@ -40,7 +40,7 @@ namespace OpenPrinterWeb.Tests
         public async Task ConvertToPdfAsync_ShouldThrowArgumentNullException_WhenInputIsNull()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _converter.ConvertToPdfAsync(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _converter.ConvertToPdfAsync(null!));
         }
 
         [Fact]
