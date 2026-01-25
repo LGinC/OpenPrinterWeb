@@ -1,28 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using SharpIpp;
 using SharpIpp.Models;
 using SharpIpp.Protocol.Models;
 
 
 namespace OpenPrinterWeb.Services
 {
-    public class CupsPrintService : IPrintService
+    public partial class CupsPrintService(
+        IConfiguration configuration,
+        ISharpIppClientWrapper client,
+        ILogger<CupsPrintService> logger)
+        : IPrintService
     {
-        private readonly string _printerUri;
-        private readonly ISharpIppClientWrapper _client;
+        private readonly string _printerUri =
+            configuration["PrinterSettings:Uri"] ?? throw new ArgumentNullException("PrinterSettings:Uri");
 
-        public CupsPrintService(IConfiguration configuration, ISharpIppClientWrapper client)
-        {
-            _printerUri = configuration["PrinterSettings:Uri"] ?? "ipp://192.168.2.108:631/printers/default";
-            _client = client;
-        }
-
-        public async Task<bool> PrintDocumentAsync(string jobName, Stream documentStream, string? printerUri = null, PrintOptions? options = null)
+        public async Task<bool> PrintDocumentAsync(string jobName, Stream documentStream, string? printerUri = null,
+            PrintOptions? options = null)
         {
             try
             {
@@ -30,7 +22,7 @@ namespace OpenPrinterWeb.Services
                 var uri = new Uri(targetUri);
                 // Add color mode attributes explicitly for better compatibility with CUPS
                 var additionalAttributes = new List<IppAttribute>();
-                if (options?.ColorMode == OpenPrinterWeb.Services.PrintColorMode.Monochrome)
+                if (options?.ColorMode == PrintColorMode.Monochrome)
                 {
                     additionalAttributes.Add(new IppAttribute(Tag.Keyword, "print-color-mode", "monochrome"));
                     additionalAttributes.Add(new IppAttribute(Tag.NameWithoutLanguage, "ColorModel", "Gray"));
@@ -74,24 +66,26 @@ namespace OpenPrinterWeb.Services
                         {
                             ranges.Add(new SharpIpp.Protocol.Models.Range(single, single));
                         }
-                        else if (rangeParts.Length == 2 && int.TryParse(rangeParts[0], out var low) && int.TryParse(rangeParts[1], out var high))
+                        else if (rangeParts.Length == 2 && int.TryParse(rangeParts[0], out var low) &&
+                                 int.TryParse(rangeParts[1], out var high))
                         {
                             ranges.Add(new SharpIpp.Protocol.Models.Range(low, high));
                         }
                     }
+
                     if (ranges.Any())
                     {
                         request.JobTemplateAttributes.PageRanges = ranges.ToArray();
                     }
                 }
 
-                var response = await _client.PrintJobAsync(request);
-                return response.JobState == JobState.Pending || response.JobState == JobState.Processing || response.JobState == JobState.PendingHeld;
+                var response = await client.PrintJobAsync(request);
+                return response.JobState == JobState.Pending || response.JobState == JobState.Processing ||
+                       response.JobState == JobState.PendingHeld;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG: Error printing: {ex}");
-                // Log exception
+                LogErrorPrinting(logger, ex);
                 return false;
             }
         }
@@ -113,9 +107,7 @@ namespace OpenPrinterWeb.Services
                     }
                 };
 
-                Console.WriteLine($"DEBUG: Fetching jobs from {baseUri}");
-                var response = await _client.GetJobsAsync(jobsRequest);
-
+                var response = await client.GetJobsAsync(jobsRequest);
                 return response.Jobs.Select(j => new JobStatusInfo
                 {
                     Id = j.JobId.GetValueOrDefault(),
@@ -127,8 +119,8 @@ namespace OpenPrinterWeb.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG: Error getting jobs: {ex}");
-                return Array.Empty<JobStatusInfo>();
+                LogErrorGettingJobs(logger, ex);
+                return [];
             }
         }
 
@@ -147,51 +139,45 @@ namespace OpenPrinterWeb.Services
                     }
                 };
 
-                Console.WriteLine($"DEBUG: Fetching printers from {baseUri}");
-                var response = await _client.GetCUPSPrintersAsync(request);
+                var response = await client.GetCUPSPrintersAsync(request);
                 var printers = new List<PrinterInfo>();
 
-                if (response.Sections != null)
+                foreach (var section in response.Sections)
                 {
-                    foreach (var section in response.Sections)
+                    if ((int)section.Tag != 4 /* PrinterAttributes */) continue;
+                    var info = new PrinterInfo();
+                    foreach (var attr in section.Attributes)
                     {
-                        if ((int)section.Tag == 4 /* PrinterAttributes */)
+                        switch (attr.Name)
                         {
-                            var info = new PrinterInfo();
-                            foreach (var attr in section.Attributes)
-                            {
-                                switch (attr.Name)
+                            case "printer-name":
+                                info.Name = attr.Value?.ToString() ?? "Unknown";
+                                break;
+                            case "printer-uri-supported":
+                                info.Uri = attr.Value switch
                                 {
-                                    case "printer-name":
-                                        info.Name = attr.Value?.ToString() ?? "Unknown";
-                                        break;
-                                    case "printer-uri-supported":
-                                        // Usually a list of URIs, take first or string join
-                                        if (attr.Value is IEnumerable<string> uris)
-                                            info.Uri = uris.FirstOrDefault() ?? string.Empty;
-                                        else if (attr.Value is object[] arr && arr.Length > 0)
-                                            info.Uri = arr[0]?.ToString() ?? string.Empty;
-                                        else
-                                            info.Uri = attr.Value?.ToString() ?? string.Empty;
-                                        break;
-                                    case "printer-info":
-                                        info.Description = attr.Value?.ToString() ?? string.Empty;
-                                        break;
-                                    case "printer-state":
-                                        // Map enum id to string if needed, or just stringify
-                                        info.State = attr.Value?.ToString() ?? "Unknown";
-                                        break;
-                                }
-                            }
-
-                            // Determine if default
-                            info.IsDefault = _printerUri.Contains(info.Name, StringComparison.OrdinalIgnoreCase);
-
-                            if (!string.IsNullOrEmpty(info.Name))
-                            {
-                                printers.Add(info);
-                            }
+                                    // Usually a list of URIs, take first or string join
+                                    IEnumerable<string> uris => uris.FirstOrDefault() ?? string.Empty,
+                                    object[] { Length: > 0 } arr => arr[0]?.ToString() ?? string.Empty,
+                                    _ => attr.Value?.ToString() ?? string.Empty
+                                };
+                                break;
+                            case "printer-info":
+                                info.Description = attr.Value?.ToString() ?? string.Empty;
+                                break;
+                            case "printer-state":
+                                // Map enum id to string if needed, or just stringify
+                                info.State = attr.Value?.ToString() ?? "Unknown";
+                                break;
                         }
+                    }
+
+                    // Determine if default
+                    info.IsDefault = _printerUri.Contains(info.Name, StringComparison.OrdinalIgnoreCase);
+
+                    if (!string.IsNullOrEmpty(info.Name))
+                    {
+                        printers.Add(info);
                     }
                 }
 
@@ -199,9 +185,18 @@ namespace OpenPrinterWeb.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG: Error getting printers: {ex}");
-                return Array.Empty<PrinterInfo>();
+                LogErrorGettingPrinters(logger, ex);
+                return [];
             }
         }
+
+        [LoggerMessage(LogLevel.Error, "Error printing")]
+        static partial void LogErrorPrinting(ILogger<CupsPrintService> logger, Exception exception);
+
+        [LoggerMessage(LogLevel.Error, "Error getting jobs")]
+        static partial void LogErrorGettingJobs(ILogger<CupsPrintService> logger, Exception ex);
+
+        [LoggerMessage(LogLevel.Error, "Error getting printers")]
+        static partial void LogErrorGettingPrinters(ILogger<CupsPrintService> logger, Exception ex);
     }
 }

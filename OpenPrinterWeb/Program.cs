@@ -110,9 +110,22 @@ if (!app.Environment.IsDevelopment())
 app.UseRequestLocalization(localizationOptions);
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 
-app.UseAntiforgery();
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Branch SignalR to bypass Antiforgery and other middleware
+app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/printerhub"), subApp =>
+{
+    subApp.UseRouting();
+    subApp.UseEndpoints(endpoints =>
+    {
+        endpoints.MapHub<PrinterHub>("");
+    });
+});
+
+app.UseAntiforgery();
 
 // Protect specific static files (uploads and others)
 app.Use(async (context, next) =>
@@ -168,7 +181,5 @@ app.MapStaticAssets();
 app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-app.MapHub<PrinterHub>("/printerhub");
 
 app.Run();
