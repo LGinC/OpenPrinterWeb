@@ -82,8 +82,11 @@ namespace OpenPrinterWeb.Tests
 
             // Assert
             Assert.Equal(outputPath, result);
-            _mockProcessExecutor.Verify(p => p.ExecuteAsync(It.Is<ProcessStartInfo>(psi => 
-                psi.FileName == LibreOfficeExecutable && 
+            var expectedExecutable = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? LibreOfficeExecutable
+                : "libreoffice";
+            _mockProcessExecutor.Verify(p => p.ExecuteAsync(It.Is<ProcessStartInfo>(psi =>
+                psi.FileName == expectedExecutable &&
                 psi.Arguments.Contains(inputPath))), Times.Once);
         }
 
