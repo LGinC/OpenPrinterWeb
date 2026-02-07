@@ -1311,6 +1311,7 @@ const PDFViewerApplication = {
     if (!this.pdfViewer.currentScaleValue) {
       this.pdfViewer.currentScaleValue = _ui_utils.DEFAULT_SCALE_VALUE;
     }
+    // Force rotation from URL to keep Blazor preview orientation in sync.
     const rotationParamFromHash = (0, _ui_utils.parseQueryString)(window.location.hash.substring(1)).get("rotation");
     const rotationParamFromQuery = (0, _ui_utils.parseQueryString)(window.location.search.substring(1)).get("rotation");
     const rotationParam = rotationParamFromHash ?? rotationParamFromQuery;

@@ -25,11 +25,11 @@ namespace OpenPrinterWeb.Tests
         public async Task UploadFileAsync_ShouldCreateDirectory_WhenItDoesNotExist()
         {
             // Arrange
-            var contentRoot = "/app";
+            var webRoot = "/app/wwwroot";
             var fileName = "test.pdf";
-            var uploadPath = Path.Combine(contentRoot, "data", "uploads");
+            var uploadPath = Path.Combine(webRoot, "uploads");
             
-            _mockEnvironment.Setup(e => e.ContentRootPath).Returns(contentRoot);
+            _mockEnvironment.Setup(e => e.WebRootPath).Returns(webRoot);
             _mockFileSystem.Setup(fs => fs.DirectoryExists(uploadPath)).Returns(false);
             _mockFileSystem.Setup(fs => fs.CreateFile(It.IsAny<string>())).Returns(new MemoryStream());
 
@@ -46,11 +46,11 @@ namespace OpenPrinterWeb.Tests
         public async Task UploadFileAsync_ShouldNotCreateDirectory_WhenItExists()
         {
             // Arrange
-            var contentRoot = "/app";
+            var webRoot = "/app/wwwroot";
             var fileName = "test.pdf";
-            var uploadPath = Path.Combine(contentRoot, "data", "uploads");
+            var uploadPath = Path.Combine(webRoot, "uploads");
 
-            _mockEnvironment.Setup(e => e.ContentRootPath).Returns(contentRoot);
+            _mockEnvironment.Setup(e => e.WebRootPath).Returns(webRoot);
             _mockFileSystem.Setup(fs => fs.DirectoryExists(uploadPath)).Returns(true);
             _mockFileSystem.Setup(fs => fs.CreateFile(It.IsAny<string>())).Returns(new MemoryStream());
 
@@ -67,12 +67,12 @@ namespace OpenPrinterWeb.Tests
         public async Task UploadFileAsync_ShouldWriteToFile()
         {
             // Arrange
-            var contentRoot = "/app";
+            var webRoot = "/app/wwwroot";
             var fileName = "test.txt";
             var fileContent = new byte[] { 1, 2, 3 };
             var outputStream = new MemoryStream();
 
-            _mockEnvironment.Setup(e => e.ContentRootPath).Returns(contentRoot);
+            _mockEnvironment.Setup(e => e.WebRootPath).Returns(webRoot);
             _mockFileSystem.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
             _mockFileSystem.Setup(fs => fs.CreateFile(It.IsAny<string>())).Returns(outputStream);
 
@@ -83,6 +83,7 @@ namespace OpenPrinterWeb.Tests
 
             // Assert
             Assert.Contains(fileName, resultPath);
+            Assert.Contains(Path.Combine(webRoot, "uploads"), resultPath);
             Assert.Equal(fileContent.Length, outputStream.ToArray().Length);
         }
     }
