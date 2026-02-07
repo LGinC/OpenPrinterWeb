@@ -141,4 +141,4 @@
   <data name="SelectFileButton" xml:space="preserve">
     <value>Seleccionar archivo</value>
   </data>
-</root>
+  <data name="PdfPreviewTitle" xml:space="preserve">`r`n    <value>Vista previa PDF</value>`r`n  </data>`r`n  <data name="ImagePreviewAlt" xml:space="preserve">`r`n    <value>Vista previa</value>`r`n  </data>`r`n  <data name="PageRangePlaceholder" xml:space="preserve">`r`n    <value>p. ej. 1-5</value>`r`n  </data>`r`n  <data name="ConvertingToPdfMessage" xml:space="preserve">`r`n    <value>Convirtiendo a PDF...</value>`r`n  </data>`r`n  <data name="LoginErrorMessage" xml:space="preserve">`r`n    <value>Error de inicio: {0}</value>`r`n  </data>`r`n</root>

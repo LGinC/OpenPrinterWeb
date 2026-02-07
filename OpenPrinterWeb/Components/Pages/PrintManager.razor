@@ -2,12 +2,12 @@
 @attribute [Authorize]
 @using OpenPrinterWeb.Services
 @using Microsoft.Extensions.Localization
+@using System.Globalization
 @inject IFileUploadService FileUploadService
 @inject IPrintService PrintService
 @inject IPdfConverter PdfConverter
 @inject NavigationManager Navigation
 @inject IStringLocalizer<SharedResource> Localizer
-@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="dashboard-container">
@@ -67,16 +67,16 @@
                                 <div class="preview-paper-wrapper d-flex justify-center my-4">
                                     <div class="preview-paper shadow-2xl" style="@GetPaperStyle()">
                                         <div class="preview-content-inner h-100 w-100 d-flex justify-center align-center" style="@GetContentFilterStyle()">
-                                            <div style="@GetRotationWrapperStyle()">
+                                            <div class="preview-rotation-wrapper" style="@GetRotationWrapperStyle()">
                                                 @if (selectedFileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                                                 {
-                                                    <embed src="@($"{selectedFileUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH")" type="application/pdf" style="width: 100%; height: 100%; display: block;" />
+                                                    <iframe class="preview-embed" @key="pdfRotationVersion" src="@GetPdfViewerUrl()" title="@Localizer["PdfPreviewTitle"]"></iframe>
                                                 }
                                                 else if (selectedFileUrl.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || 
                                                          selectedFileUrl.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) || 
                                                          selectedFileUrl.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                                                 {
-                                                    <img src="@selectedFileUrl" alt="Preview" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+                                                    <img src="@selectedFileUrl" alt="@Localizer["ImagePreviewAlt"]" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
                                                 }
                                                 else
                                                 {
@@ -93,7 +93,7 @@
                                 <div class="preview-info-tag pa-2 px-4 rounded-pill shadow-md">
                                     <MudIcon Icon="@Icons.Material.Filled.Description" Size="Size.Small" Class="mr-2" />
                                     <MudText Typo="Typo.caption" Class="fw-bold">@selectedFileName</MudText>
-                                    <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" Color="Color.Error" Class="ml-2" OnClick="() => selectedFileUrl = null" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" Color="Color.Error" Class="ml-2" OnClick="ClearSelectedFile" />
                                 </div>
                             </div>
                         </div>
@@ -140,7 +140,7 @@
                                 </MudSelect>
                             </MudItem>
                             <MudItem xs="6" md="3">
-                                <MudSelect T="PrintOrientation" Label="@Localizer["OrientationLabel"]" @bind-Value="printOptions.Orientation" Variant="Variant.Outlined" Class="bg-surface rounded-lg">
+                                <MudSelect T="PrintOrientation" Label="@Localizer["OrientationLabel"]" @bind-Value="SelectedOrientation" Variant="Variant.Outlined" Class="bg-surface rounded-lg">
                                     <MudSelectItem Value="@PrintOrientation.Portrait">
                                         <div class="d-flex align-center">
                                             <MudIcon Icon="@Icons.Material.Filled.Portrait" Size="Size.Small" Class="mr-2" />
@@ -159,7 +159,7 @@
                                 <MudNumericField @bind-Value="printOptions.Copies" Label="@Localizer["CopiesLabel"]" Variant="Variant.Outlined" Min="1" Class="bg-surface rounded-lg" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ContentCopy" />
                             </MudItem>
                             <MudItem xs="6" md="3">
-                                <MudTextField @bind-Value="printOptions.PageRange" Label="@Localizer["PageRangeLabel"]" Variant="Variant.Outlined" Placeholder="e.g. 1-5" Class="bg-surface rounded-lg" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Layers" />
+                                <MudTextField @bind-Value="printOptions.PageRange" Label="@Localizer["PageRangeLabel"]" Variant="Variant.Outlined" Placeholder="@Localizer["PageRangePlaceholder"]" Class="bg-surface rounded-lg" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Layers" />
                             </MudItem>
                         </MudGrid>
 
@@ -368,6 +368,18 @@
         transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
+    .preview-content-inner,
+    .preview-rotation-wrapper,
+    .preview-embed {
+        width: 100%;
+        height: 100%;
+    }
+
+    .preview-embed {
+        display: block;
+        border: 0;
+    }
+
     .color-dot {
         width: 12px;
         height: 12px;
@@ -452,9 +464,35 @@
     private PrintOptions printOptions = new();
     private JobStatusInfo[]? jobs;
     private PrinterInfo[]? printers;
+    private int pdfRotation;
+    private int pdfRotationVersion;
+    private CultureInfo? _uiCulture;
+    private CultureInfo? _uiUiCulture;
+
+    private bool IsPdfPreviewActive =>
+        !string.IsNullOrEmpty(selectedFileUrl) &&
+        selectedFileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
+
+    private PrintOrientation SelectedOrientation
+    {
+        get => printOptions.Orientation;
+        set
+        {
+            if (printOptions.Orientation == value)
+            {
+                return;
+            }
+
+            printOptions.Orientation = value;
+            UpdatePdfRotation();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        _uiCulture = CultureInfo.CurrentCulture;
+        _uiUiCulture = CultureInfo.CurrentUICulture;
+
         // Subscribe to server-side events
         PrintService.OnJobUpdate += HandleJobUpdate;
 
@@ -473,6 +511,16 @@
         // Dispatch to UI thread
         InvokeAsync(() =>
         {
+            if (_uiCulture != null)
+            {
+                CultureInfo.CurrentCulture = _uiCulture;
+            }
+
+            if (_uiUiCulture != null)
+            {
+                CultureInfo.CurrentUICulture = _uiUiCulture;
+            }
+
             jobs = updatedJobs;
             StateHasChanged();
         });
@@ -503,7 +551,7 @@
                 selectedFileName = file.Name;
                 
                 var fileName = Path.GetFileName(selectedFilePath);
-                selectedFileUrl = $"uploads/{fileName}";
+                selectedFileUrl = $"/uploads/{fileName}";
 
                 // Convert Office files to PDF immediately for preview
                 var extension = Path.GetExtension(selectedFileName).ToLower();
@@ -511,12 +559,12 @@
                     extension == ".xls" || extension == ".xlsx" || 
                     extension == ".ppt" || extension == ".pptx")
                 {
-                    statusMessage = "Converting to PDF for preview...";
+                    statusMessage = Localizer["ConvertingToPdfMessage"];
                     StateHasChanged();
                     
                     var pdfPath = await PdfConverter.ConvertToPdfAsync(selectedFilePath);
                     var pdfFileName = Path.GetFileName(pdfPath);
-                    selectedFileUrl = $"uploads/{pdfFileName}"; // Update preview URL to the converted PDF
+                    selectedFileUrl = $"/uploads/{pdfFileName}"; // Update preview URL to the converted PDF
                     
                     // Update internal path to point to the PDF for printing later
                     selectedFilePath = pdfPath; 
@@ -525,6 +573,7 @@
 
                 statusMessage = string.Format(Localizer["FileReadyMessage"], selectedFileName);
                 statusClass = "alert-success";
+                UpdatePdfPreviewState();
                 Console.WriteLine($"DEBUG: File selected and prepared: {selectedFileUrl}");
             }
         }
@@ -579,6 +628,46 @@
         }
     }
 
+    private void UpdatePdfPreviewState()
+    {
+        if (IsPdfPreviewActive)
+        {
+            UpdatePdfRotation();
+        }
+
+        StateHasChanged();
+    }
+
+    private void ClearSelectedFile()
+    {
+        selectedFileUrl = null;
+        selectedFilePath = null;
+        selectedFileName = null;
+        UpdatePdfPreviewState();
+    }
+
+    private void UpdatePdfRotation()
+    {
+        pdfRotation = printOptions.Orientation == PrintOrientation.Landscape ? 90 : 0;
+        if (IsPdfPreviewActive)
+        {
+            pdfRotationVersion++;
+            StateHasChanged();
+        }
+    }
+
+    private string? GetPdfViewerUrl()
+    {
+        if (!IsPdfPreviewActive || string.IsNullOrEmpty(selectedFileUrl))
+        {
+            return null;
+        }
+
+        var absoluteFileUrl = Navigation.ToAbsoluteUri(selectedFileUrl).ToString();
+        var fileParam = Uri.EscapeDataString(absoluteFileUrl);
+        return $"/pdfjs/web/viewer.html?file={fileParam}&rotation={pdfRotation}&v={pdfRotationVersion}&disablepreferences=true&viewonload=1&disablehistory=true#page=1&zoom=page-width&rotation={pdfRotation}&sidebar=0&pagemode=none";
+    }
+
     private Severity GetSeverity()
     {
         return statusClass switch
@@ -608,8 +697,8 @@
     {
         bool isLandscape = printOptions.Orientation == PrintOrientation.Landscape;
         // Using common aspect ratios to represent A4 paper
-        string width = isLandscape ? "450px" : "320px";
-        string height = isLandscape ? "320px" : "450px";
+        string width = isLandscape ? "clamp(450px, 60vw, 880px)" : "clamp(320px, 45vw, 720px)";
+        string height = isLandscape ? "clamp(320px, 50vh, 620px)" : "clamp(450px, 70vh, 880px)";
         return $"width: {width}; height: {height}; transition: all 0.3s ease-in-out; position: relative; overflow: hidden;";
     }
 
@@ -626,8 +715,11 @@
     {
         bool isLandscape = printOptions.Orientation == PrintOrientation.Landscape;
         var styles = new List<string> { "transition: all 0.3s ease-in-out", "display: block" };
+
+        var isPdf = !string.IsNullOrEmpty(selectedFileUrl) &&
+                    selectedFileUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
         
-        if (isLandscape)
+        if (isLandscape && !isPdf)
         {
             // Use portrait dimensions for the content before rotation
             styles.Add("width: 320px");

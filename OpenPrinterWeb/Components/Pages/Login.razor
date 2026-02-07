@@ -187,7 +187,7 @@
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error: {ex.Message}";
+            errorMessage = string.Format(Localizer["LoginErrorMessage"], ex.Message);
         }
         finally
         {

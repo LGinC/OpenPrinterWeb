@@ -3,7 +3,7 @@
 # This stage is used when running from VS in fast mode (Default for Debug config)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS base
 # Install ICU libs for localization support, LibreOffice for conversion, Java for some doc formats, and fonts (including Chinese)
-RUN apk add --no-cache icu-libs libreoffice openjdk11-jre ttf-dejavu ttf-liberation \
+RUN apk add --no-cache icu-libs libreoffice ttf-dejavu ttf-liberation \
     font-noto-cjk font-noto-emoji terminus-font
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 

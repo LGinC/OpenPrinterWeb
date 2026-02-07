@@ -141,4 +141,19 @@
   <data name="SelectFileButton" xml:space="preserve">
     <value>选择文件</value>
   </data>
+  <data name="PdfPreviewTitle" xml:space="preserve">
+    <value>PDF 预览</value>
+  </data>
+  <data name="ImagePreviewAlt" xml:space="preserve">
+    <value>预览</value>
+  </data>
+  <data name="PageRangePlaceholder" xml:space="preserve">
+    <value>例如 1-5</value>
+  </data>
+  <data name="ConvertingToPdfMessage" xml:space="preserve">
+    <value>正在转换为 PDF 以供预览...</value>
+  </data>
+  <data name="LoginErrorMessage" xml:space="preserve">
+    <value>登录错误：{0}</value>
+  </data>
 </root>

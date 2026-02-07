@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Localization;
 using System.Text;
 using System.Security.Claims;
 using Microsoft.AspNetCore.DataProtection;
@@ -96,6 +97,11 @@ var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture("zh-Hans")
     .AddSupportedCultures(supportedCultures)
     .AddSupportedUICultures(supportedCultures);
+localizationOptions.RequestCultureProviders = new IRequestCultureProvider[]
+{
+    new CookieRequestCultureProvider(),
+    new QueryStringRequestCultureProvider()
+};
 
 var app = builder.Build();
 
@@ -118,6 +124,13 @@ app.UseAntiforgery();
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value;
+    if (path != null && path.StartsWith("/uploads", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.Headers["Access-Control-Allow-Origin"] = "https://mozilla.github.io";
+        await next();
+        return;
+    }
+
     if (path != null &&
         !path.StartsWith("/login", StringComparison.OrdinalIgnoreCase) &&
         !path.StartsWith("/api/auth", StringComparison.OrdinalIgnoreCase) &&
@@ -149,19 +162,15 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.UseStaticFiles();
-
 // Serve files from the persistent uploads directory
-var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "data", "uploads");
+var webRootPath = app.Environment.WebRootPath;
+var uploadsPath = Path.Combine(webRootPath, "uploads");
 if (!Directory.Exists(uploadsPath))
 {
     Directory.CreateDirectory(uploadsPath);
 }
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
-    RequestPath = "/uploads"
-});
+
+app.UseStaticFiles();
 
 app.MapStaticAssets();
 

@@ -141,4 +141,19 @@
   <data name="SelectFileButton" xml:space="preserve">
     <value>Select File</value>
   </data>
+  <data name="PdfPreviewTitle" xml:space="preserve">
+    <value>PDF Preview</value>
+  </data>
+  <data name="ImagePreviewAlt" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="PageRangePlaceholder" xml:space="preserve">
+    <value>e.g. 1-5</value>
+  </data>
+  <data name="ConvertingToPdfMessage" xml:space="preserve">
+    <value>Converting to PDF for preview...</value>
+  </data>
+  <data name="LoginErrorMessage" xml:space="preserve">
+    <value>Login error: {0}</value>
+  </data>
 </root>
