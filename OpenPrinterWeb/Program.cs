@@ -140,14 +140,15 @@ app.Use(async (context, next) =>
         !path.Equals("/favicon.png", StringComparison.OrdinalIgnoreCase) &&
         !path.EndsWith(".css", StringComparison.OrdinalIgnoreCase) &&
         !path.EndsWith(".js", StringComparison.OrdinalIgnoreCase) &&
+        !path.EndsWith(".html", StringComparison.OrdinalIgnoreCase) &&
         !path.Equals("/", StringComparison.OrdinalIgnoreCase) &&
         !path.Equals("/not-found", StringComparison.OrdinalIgnoreCase))
     {
+        var isPageRequest = context.Request.Method == "GET" && !path.Contains('.');
         if (!context.User.Identity?.IsAuthenticated ?? true)
         {
             // Only redirect to login for GET requests that don't look like static assets
-            bool isPageRequest = context.Request.Method == "GET" && !path.Contains('.');
-            
+
             if (isPageRequest)
             {
                 context.Response.Redirect($"/login?returnUrl={Uri.EscapeDataString(path)}");
