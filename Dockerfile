@@ -33,9 +33,9 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Create data directory and set permissions for the non-root user
+# Create writable directory and set permissions for the non-root user
 USER root
-RUN mkdir -p /app/data && chown -R $APP_UID:$APP_UID /app/data
+RUN mkdir -p /app/wwwroot/uploads && chown -R $APP_UID:$APP_UID /app/wwwroot
 USER $APP_UID
 
 # Support graceful exit: Increase shutdown timeout for SignalR and background tasks
