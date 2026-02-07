@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace OpenPrinterWeb.Tests
 {
@@ -81,6 +82,56 @@ namespace OpenPrinterWeb.Tests
             Assert.True(state.User.Identity!.IsAuthenticated);
             Assert.Equal("httpUser", state.User.Identity!.Name);
             // Should verify localStorage was NOT called if HttpContext is used (optimization check, optional)
+        }
+
+        [Fact]
+        public async Task GetAuthenticationStateAsync_ShouldReturnAnonymous_WhenJsThrows()
+        {
+            // Arrange
+            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns((HttpContext?)null);
+            _mockJsRuntime.Setup(x => x.InvokeAsync<string?>("localStorage.getItem", It.IsAny<object[]>()))
+                .Throws(new JSException("JS unavailable"));
+
+            // Act
+            var state = await _provider.GetAuthenticationStateAsync();
+
+            // Assert
+            Assert.NotNull(state.User.Identity);
+            Assert.False(state.User.Identity!.IsAuthenticated);
+        }
+
+        [Fact]
+        public async Task NotifyUserAuthentication_ShouldRaiseAuthenticatedState()
+        {
+            // Arrange
+            var token = GenerateTestJwt();
+            var tcs = new TaskCompletionSource<AuthenticationState>();
+            _provider.AuthenticationStateChanged += task => tcs.TrySetResult(task.Result);
+
+            // Act
+            _provider.NotifyUserAuthentication(token);
+            var state = await tcs.Task;
+
+            // Assert
+            Assert.NotNull(state.User.Identity);
+            Assert.True(state.User.Identity!.IsAuthenticated);
+            Assert.Contains(state.User.Claims, c => c.Value == "testuser");
+        }
+
+        [Fact]
+        public async Task NotifyUserLogout_ShouldRaiseAnonymousState()
+        {
+            // Arrange
+            var tcs = new TaskCompletionSource<AuthenticationState>();
+            _provider.AuthenticationStateChanged += task => tcs.TrySetResult(task.Result);
+
+            // Act
+            _provider.NotifyUserLogout();
+            var state = await tcs.Task;
+
+            // Assert
+            Assert.NotNull(state.User.Identity);
+            Assert.False(state.User.Identity!.IsAuthenticated);
         }
 
         private string GenerateTestJwt()

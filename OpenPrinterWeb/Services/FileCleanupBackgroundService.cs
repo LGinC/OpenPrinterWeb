@@ -18,16 +18,26 @@ namespace OpenPrinterWeb.Services
         private readonly PeriodicTimer _timer;
 
         public FileCleanupBackgroundService(
-            IConfiguration configuration, 
+            IConfiguration configuration,
             ILogger<FileCleanupBackgroundService> logger,
             IWebHostEnvironment environment,
             IFileSystem fileSystem)
+            : this(configuration, logger, environment, fileSystem, TimeSpan.FromHours(24))
+        {
+        }
+
+        public FileCleanupBackgroundService(
+            IConfiguration configuration,
+            ILogger<FileCleanupBackgroundService> logger,
+            IWebHostEnvironment environment,
+            IFileSystem fileSystem,
+            TimeSpan period)
         {
             _configuration = configuration;
             _logger = logger;
             _environment = environment;
             _fileSystem = fileSystem;
-            _timer = new PeriodicTimer(TimeSpan.FromHours(24)); // Run once a day
+            _timer = new PeriodicTimer(period);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

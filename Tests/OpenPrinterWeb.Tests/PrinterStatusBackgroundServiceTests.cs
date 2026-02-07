@@ -72,6 +72,10 @@ namespace OpenPrinterWeb.Tests
             {
                 // Expected
             }
+            finally
+            {
+                await service.StopAsync(CancellationToken.None);
+            }
 
             // Assert
             // Verify scope creation happened
@@ -84,6 +88,37 @@ namespace OpenPrinterWeb.Tests
             
             _mockPrintService.Verify(x => x.GetJobsAsync(), Times.AtLeastOnce, "GetJobsAsync was not called");
             _mockPrintService.Verify(x => x.BroadcastJobUpdate(jobs), Times.AtLeastOnce, "BroadcastJobUpdate was not called");
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_ShouldHandleExceptions()
+        {
+            // Arrange
+            _mockPrintService.Setup(x => x.GetJobsAsync()).ThrowsAsync(new Exception("failure"));
+
+            var service = new PrinterStatusBackgroundService(_mockServiceProvider.Object, TimeSpan.FromMilliseconds(50));
+
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(500);
+
+            // Act
+            await service.StartAsync(cts.Token);
+            await Task.Delay(600);
+            await service.StopAsync(CancellationToken.None);
+
+            // Assert
+            _mockPrintService.Verify(x => x.GetJobsAsync(), Times.AtLeastOnce);
+            _mockPrintService.Verify(x => x.BroadcastJobUpdate(It.IsAny<JobStatusInfo[]>()), Times.Never);
+        }
+
+        [Fact]
+        public void Constructor_ShouldInitializeWithDefaultPeriod()
+        {
+            // Arrange & Act
+            var service = new PrinterStatusBackgroundService(_mockServiceProvider.Object);
+
+            // Assert
+            Assert.NotNull(service);
         }
     }
 }

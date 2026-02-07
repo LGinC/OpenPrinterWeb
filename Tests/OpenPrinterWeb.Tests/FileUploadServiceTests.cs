@@ -86,5 +86,30 @@ namespace OpenPrinterWeb.Tests
             Assert.Contains(Path.Combine(webRoot, "uploads"), resultPath);
             Assert.Equal(fileContent.Length, outputStream.ToArray().Length);
         }
+
+        [Fact]
+        public async Task UploadFileAsync_ShouldFallbackToContentRoot_WhenWebRootIsNull()
+        {
+            // Arrange
+            var contentRoot = "/app";
+            var fileName = "test.txt";
+            var fileContent = new byte[] { 4, 5, 6 };
+            var outputStream = new MemoryStream();
+            var expectedUploadPath = Path.Combine(contentRoot, "wwwroot", "uploads");
+
+            _mockEnvironment.Setup(e => e.WebRootPath).Returns((string?)null);
+            _mockEnvironment.Setup(e => e.ContentRootPath).Returns(contentRoot);
+            _mockFileSystem.Setup(fs => fs.DirectoryExists(expectedUploadPath)).Returns(true);
+            _mockFileSystem.Setup(fs => fs.CreateFile(It.IsAny<string>())).Returns(outputStream);
+
+            using var inputStream = new MemoryStream(fileContent);
+
+            // Act
+            var resultPath = await _service.UploadFileAsync(inputStream, fileName);
+
+            // Assert
+            Assert.Contains(Path.Combine(contentRoot, "wwwroot", "uploads"), resultPath);
+            Assert.Equal(fileContent.Length, outputStream.ToArray().Length);
+        }
     }
 }

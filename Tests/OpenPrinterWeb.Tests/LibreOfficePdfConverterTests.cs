@@ -7,6 +7,7 @@ using Moq;
 using OpenPrinterWeb.Services;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace OpenPrinterWeb.Tests
 {
@@ -116,6 +117,52 @@ namespace OpenPrinterWeb.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<FileNotFoundException>(() => _converter.ConvertToPdfAsync(inputPath));
+        }
+
+        [Fact]
+        public async Task ConvertToPdfAsync_ShouldThrowInvalidOperationException_WhenWindowsBasePathMissing()
+        {
+            // Arrange
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
+            var inputPath = Path.Combine("tmp", "test.docx");
+            _mockFileSystem.Setup(fs => fs.Exists(inputPath)).Returns(true);
+
+            var configuration = new ConfigurationBuilder().Build();
+            var converter = new LibreOfficePdfConverter(_mockProcessExecutor.Object, _mockFileSystem.Object, configuration);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() => converter.ConvertToPdfAsync(inputPath));
+        }
+
+        [Fact]
+        public async Task ConvertToPdfAsync_ShouldThrowFileNotFoundException_WhenLibreOfficeExecutableMissing()
+        {
+            // Arrange
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
+            var inputPath = Path.Combine("tmp", "test.docx");
+            _mockFileSystem.Setup(fs => fs.Exists(inputPath)).Returns(true);
+            _mockFileSystem.Setup(fs => fs.Exists(It.Is<string>(path => path != inputPath)))
+                .Returns(false);
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["LibreOffice:WindowsBasePath"] = WindowsBasePath
+                })
+                .Build();
+            var converter = new LibreOfficePdfConverter(_mockProcessExecutor.Object, _mockFileSystem.Object, configuration);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<FileNotFoundException>(() => converter.ConvertToPdfAsync(inputPath));
+            _mockProcessExecutor.Verify(p => p.ExecuteAsync(It.IsAny<ProcessStartInfo>()), Times.Never);
         }
 
         private void SetupFileSystemExists(string inputPath, string outputPath, bool inputExists, bool outputExists)

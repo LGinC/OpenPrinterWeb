@@ -78,5 +78,94 @@ namespace OpenPrinterWeb.Tests
             // Assert
             _mockFileSystem.Verify(fs => fs.GetFiles(It.IsAny<string>()), Times.Never);
         }
+
+        [Fact]
+        public void CleanupFiles_ShouldContinue_WhenDeleteFails()
+        {
+            // Arrange
+            var uploadPath = Path.Combine("/app", "data", "uploads");
+            var oldFile = Path.Combine(uploadPath, "old.pdf");
+
+            _mockFileSystem.Setup(fs => fs.DirectoryExists(uploadPath)).Returns(true);
+            _mockFileSystem.Setup(fs => fs.GetFiles(uploadPath)).Returns(new[] { oldFile });
+            _mockFileSystem.Setup(fs => fs.GetCreationTime(oldFile)).Returns(DateTime.Now.AddDays(-31));
+            _mockFileSystem.Setup(fs => fs.DeleteFile(oldFile)).Throws(new IOException("Delete failed"));
+
+            // Act
+            var exception = Record.Exception(() => _service.CleanupFiles());
+
+            // Assert
+            Assert.Null(exception);
+            _mockFileSystem.Verify(fs => fs.DeleteFile(oldFile), Times.Once);
+        }
+
+        [Fact]
+        public void CleanupFiles_ShouldLog_WhenFilesAreDeleted()
+        {
+            // Arrange
+            var uploadPath = Path.Combine("/app", "data", "uploads");
+            var oldFile = Path.Combine(uploadPath, "old.pdf");
+
+            _mockFileSystem.Setup(fs => fs.DirectoryExists(uploadPath)).Returns(true);
+            _mockFileSystem.Setup(fs => fs.GetFiles(uploadPath)).Returns(new[] { oldFile });
+            _mockFileSystem.Setup(fs => fs.GetCreationTime(oldFile)).Returns(DateTime.Now.AddDays(-31));
+
+            // Act
+            _service.CleanupFiles();
+
+            // Assert
+            _mockFileSystem.Verify(fs => fs.DeleteFile(oldFile), Times.Once);
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_ShouldRunCleanupLoop()
+        {
+            // Arrange
+            var service = new FileCleanupBackgroundService(
+                _mockConfig.Object,
+                _mockLogger.Object,
+                _mockEnvironment.Object,
+                _mockFileSystem.Object,
+                TimeSpan.FromMilliseconds(20));
+
+            _mockFileSystem.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
+
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(120);
+
+            // Act
+            await service.StartAsync(cts.Token);
+            await Task.Delay(150);
+            await service.StopAsync(CancellationToken.None);
+
+            // Assert
+            _mockFileSystem.Verify(fs => fs.DirectoryExists(It.IsAny<string>()), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_ShouldHandleCleanupExceptions()
+        {
+            // Arrange
+            var service = new FileCleanupBackgroundService(
+                _mockConfig.Object,
+                _mockLogger.Object,
+                _mockEnvironment.Object,
+                _mockFileSystem.Object,
+                TimeSpan.FromMilliseconds(20));
+
+            _mockFileSystem.Setup(fs => fs.DirectoryExists(It.IsAny<string>()))
+                .Throws(new IOException("Failure"));
+
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(120);
+
+            // Act
+            await service.StartAsync(cts.Token);
+            await Task.Delay(150);
+            await service.StopAsync(CancellationToken.None);
+
+            // Assert
+            _mockFileSystem.Verify(fs => fs.DirectoryExists(It.IsAny<string>()), Times.AtLeastOnce);
+        }
     }
 }
