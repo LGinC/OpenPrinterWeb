@@ -141,6 +141,8 @@ app.Use(async (context, next) =>
         !path.EndsWith(".css", StringComparison.OrdinalIgnoreCase) &&
         !path.EndsWith(".js", StringComparison.OrdinalIgnoreCase) &&
         !path.EndsWith(".html", StringComparison.OrdinalIgnoreCase) &&
+        !path.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) &&
+        !path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) &&
         !path.Equals("/", StringComparison.OrdinalIgnoreCase) &&
         !path.Equals("/not-found", StringComparison.OrdinalIgnoreCase))
     {
